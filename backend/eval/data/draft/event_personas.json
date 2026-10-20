@@ -1,0 +1,180 @@
+[
+ {
+  "interests": "I love yoga and stretching. Quiet places help me calm down.",
+  "gold": [
+   "srwc-yoga",
+   "caps-mindful",
+   "garden-walk",
+   "rest-room"
+  ]
+ },
+ {
+  "interests": "I need to move and sweat when stressed. Gym, cardio, music.",
+  "gold": [
+   "srwc-cycle",
+   "srwc-zumba",
+   "srwc-yoga"
+  ]
+ },
+ {
+  "interests": "Dogs make everything better.",
+  "gold": [
+   "asi-puppies"
+  ]
+ },
+ {
+  "interests": "I'm anxious before exams and want practical tips.",
+  "gold": [
+   "caps-test-anxiety",
+   "ocean-stress-less",
+   "caps-mindful"
+  ]
+ },
+ {
+  "interests": "I want to make friends, I'm new and a bit lonely.",
+  "gold": [
+   "board-games",
+   "sunrise-hike",
+   "ocean-stress-less",
+   "asi-midterm-recharge"
+  ]
+ },
+ {
+  "interests": "Painting and drawing relax me.",
+  "gold": [
+   "art-night",
+   "asi-midterm-recharge"
+  ]
+ },
+ {
+  "interests": "Nature and hiking. I hate big crowds.",
+  "gold": [
+   "sunrise-hike",
+   "garden-walk"
+  ]
+ },
+ {
+  "interests": "I'm exhausted and just need to rest or nap.",
+  "gold": [
+   "rest-room",
+   "caps-mindful"
+  ]
+ },
+ {
+  "interests": "Free food please, I'm broke and hungry.",
+  "gold": [
+   "beach-pantry",
+   "asi-midterm-recharge",
+   "asi-puppies"
+  ]
+ },
+ {
+  "interests": "Games and having fun with people.",
+  "gold": [
+   "board-games",
+   "bowling"
+  ]
+ },
+ {
+  "interests": "Live music, especially jazz.",
+  "gold": [
+   "noon-jazz",
+   "srwc-zumba"
+  ]
+ },
+ {
+  "interests": "Meditation and mindfulness.",
+  "gold": [
+   "caps-mindful",
+   "garden-walk",
+   "srwc-yoga"
+  ]
+ },
+ {
+  "interests": "I'd like to dance.",
+  "gold": [
+   "srwc-zumba"
+  ]
+ },
+ {
+  "interests": "I study best with other people around and coffee.",
+  "gold": [
+   "study-jam"
+  ]
+ },
+ {
+  "interests": "Crafts and creative stuff, plus snacks.",
+  "gold": [
+   "asi-midterm-recharge",
+   "art-night",
+   "library-coloring"
+  ]
+ },
+ {
+  "interests": "I'm an introvert. Something calm and small.",
+  "gold": [
+   "caps-mindful",
+   "garden-walk",
+   "art-night",
+   "rest-room",
+   "library-coloring"
+  ]
+ },
+ {
+  "interests": "Talking with other students about stress and how they manage time.",
+  "gold": [
+   "ocean-stress-less",
+   "caps-test-anxiety"
+  ]
+ },
+ {
+  "interests": "Being outdoors and walking.",
+  "gold": [
+   "garden-walk",
+   "sunrise-hike"
+  ]
+ },
+ {
+  "interests": "Bowling or arcade games between classes.",
+  "gold": [
+   "bowling",
+   "board-games"
+  ]
+ },
+ {
+  "interests": "Exercise, but nothing too intense. Stretching is good.",
+  "gold": [
+   "srwc-yoga",
+   "garden-walk"
+  ]
+ },
+ {
+  "interests": "Animals and fresh air.",
+  "gold": [
+   "asi-puppies",
+   "sunrise-hike",
+   "garden-walk"
+  ]
+ },
+ {
+  "interests": "I want to feel less overwhelmed and maybe talk to someone.",
+  "gold": [
+   "caps-test-anxiety",
+   "ocean-stress-less",
+   "caps-mindful"
+  ]
+ },
+ {
+  "interests": "Sleep. I really need sleep.",
+  "gold": [
+   "rest-room"
+  ]
+ },
+ {
+  "interests": "Music and art, something creative and chill.",
+  "gold": [
+   "art-night",
+   "noon-jazz"
+  ]
+ }
+]

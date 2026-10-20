@@ -1,0 +1,5 @@
+starlette>=0.37
+uvicorn>=0.29
+numpy>=1.26
+requests>=2.31
+tzdata>=2024.1   # time zone data for zoneinfo on Windows
