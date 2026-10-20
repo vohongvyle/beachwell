@@ -2,9 +2,9 @@
 
 **A weekly workload score for CSULB students.** BeachWell reads a student's Canvas deadlines and short daily check-ins, gives every week of the semester a Workload Score from 0 to 100 (Light, Moderate, Heavy or Overload), builds a study plan that spreads the work into lighter weeks, suggests small habits for heavy weeks, and recommends campus events that fit the student's free time. A Campus Stress Radar shows ASI, CAPS and instructors, anonymously, when whole groups of students are heading into an overload week.
 
-CECS 458/558 term project, Fall 2026. Team: Vo Hong Vy Le and Deborah Shaw.
+CECS 558 term project, Fall 2026. Team: Vo Hong Vy Le and Deborah Shaw.
 
-## Timeline before Phrase 2 (updated Oct 20, 2026)
+## Timeline before Phrase 2
 
 Phase 1 is done: the working prototype (all 7 parts, 32 tests), first evaluation results and the Phase 1 report. The list below is what is left, in order of due date. Owners are a proposal; change them as we agree.
 
@@ -25,7 +25,7 @@ Phase 1 is done: the working prototype (all 7 parts, 32 tests), first evaluation
 - [ ] **Web app polish** (Deborah): phone layout, wording on every screen, page background (white now; `#F6F8F8` is the other option).
 
 ### By Fri Nov 20: Phase 2
-- [ ] **2-page progress report** (Deborah writes, Vy adds the numbers): what was built, evaluation with the team's labels and Gemini, and what changed since Phase 1.
+- [ ] **2-page progress report**: what was built, evaluation with the team's labels and Gemini, and what changed since Phase 1.
 - [ ] **GitHub documentation**: this README, `docs/AI_WORKFLOW.md` (prompts, inputs and outputs, limits), and how to reproduce the results.
 
 ### By Fri Dec 4: classmate test and error review
