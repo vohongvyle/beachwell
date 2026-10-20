@@ -9,27 +9,27 @@ CECS 558 term project, Fall 2026. Team: Vo Hong Vy Le and Deborah Shaw.
 Phase 1 is done: the working prototype (all 7 parts, 32 tests), first evaluation results and the Phase 1 report. The list below is what is left, in order of due date. Owners are a proposal; change them as we agree.
 
 ### By Fri Oct 23: data
-- [ ] **Real event dates** (Deborah): replace the placeholder dates and times in `backend/data/events_catalog.csv` with real ASI, CAPS and Rec programs, add a few new ones, then run `python scripts/seed.py --reset`.
+- [ ] **Real event dates** : replace the placeholder dates and times in `backend/data/events_catalog.csv` with real ASI, CAPS and Rec programs, add a few new ones, then run `python scripts/seed.py --reset`.
 - [ ] **Label the test data** (both, separately): fill in your own sheets in `backend/labeling/` without looking at the other person's (60 hour estimates and 24 event choices, about 2 hours each). See `backend/labeling/README.md`.
 - [ ] **Write a fresh safety set** (both): 30 everyday-stress and 30 help-needed messages in `backend/labeling/safety_messages_team.csv`. The current set was used to tune the rules, so its results are too optimistic.
-- [ ] **Merge labels** (Vy): run `python scripts/merge_labels.py` to get Cohen's kappa and `labeling/agreement_report.md`.
+- [ ] **Merge labels**: run `python scripts/merge_labels.py` to get Cohen's kappa and `labeling/agreement_report.md`.
 
 ### By Fri Oct 30: run with Gemini
-- [ ] **Get a Gemini API key** from Google AI Studio and put it in `backend/.env` only. Never commit it.
-- [ ] **Re-run the evaluation** (Vy): `python eval/evaluate.py`, so the Gemini rows sit next to the offline and baseline rows.
-- [ ] **Review Gemini's mistakes** (Vy): check `GET /api/llm-log` and note latency, failures, and the hour estimates it got most wrong.
+- [ ] **Get a Gemini API key** from Google AI Studio and put it in `backend/.env` only. Never commit it. 
+- [ ] **Re-run the evaluation**: `python eval/evaluate.py`, so the Gemini rows sit next to the offline and baseline rows.
+- [ ] **Review Gemini's mistakes**: check `GET /api/llm-log` and note latency, failures, and the hour estimates it got most wrong.
 
 ### By Fri Nov 13: finished app on GitHub
 - [ ] **GitHub repo** (both): each person commits their own part (Vy: backend, AI agents, evaluation; Deborah: web app, event list, docs). Check that no key or personal data is in the repo.
 - [ ] **Test with a real Canvas feed** (both): import your own `.ics` locally to make sure the reader works. Do not upload it anywhere.
-- [ ] **Web app polish** (Deborah): phone layout, wording on every screen, page background (white now; `#F6F8F8` is the other option).
+- [ ] **Web app polish**: phone layout, wording on every screen, page background (white now; `#F6F8F8` is the other option).
 
 ### By Fri Nov 20: Phase 2
 - [ ] **2-page progress report**: what was built, evaluation with the team's labels and Gemini, and what changed since Phase 1.
 - [ ] **GitHub documentation**: this README, `docs/AI_WORKFLOW.md` (prompts, inputs and outputs, limits), and how to reproduce the results.
 
 ### By Fri Dec 4: classmate test and error review
-- [ ] **Usability test** (Deborah leads): 8–10 classmates, following `usability/test_script.md`. Enter answers in `usability/sus_responses.csv`, then run `python scripts/score_sus.py`.
+- [ ] **Usability test**: Maybe 8–10 classmates, following `usability/test_script.md`. Enter answers in `usability/sus_responses.csv`, then run `python scripts/score_sus.py`.
 - [ ] **Error review**: look at the worst cases (wrong hour estimates, poor event picks) and write them up for the final report.
 
 ### By Fri Dec 11: Phase 3
