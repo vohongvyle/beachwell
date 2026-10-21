@@ -5,9 +5,6 @@
 CECS 558 term project, Fall 2026. Team: Vo Hong Vy Le and Deborah Shaw.
 
 ## Timeline before Phrase 2
-
-Phase 1 is done: the working prototype (all 7 parts, 32 tests), first evaluation results and the Phase 1 report. The list below is what is left, in order of due date. Owners are a proposal; change them as we agree.
-
 ### By Fri Oct 23: data
 - [ ] **Real event dates** : replace the placeholder dates and times in `backend/data/events_catalog.csv` with real ASI, CAPS and Rec programs, add a few new ones, then run `python scripts/seed.py --reset`.
 - [ ] **Label the test data** (both, separately): fill in your own sheets in `backend/labeling/` without looking at the other person's (60 hour estimates and 24 event choices, about 2 hours each). See `backend/labeling/README.md`.
@@ -39,8 +36,6 @@ Phase 1 is done: the working prototype (all 7 parts, 32 tests), first evaluation
 Both of us should be able to explain the whole system, since questions can go to either person.
 
 > BeachWell plans and recommends. It never diagnoses or gives medical advice, and any sign of crisis sends the student straight to the 988 Lifeline and CSULB CAPS.
-
-![Workload screen](docs/screenshots/2-workload.png)
 
 ## What it does
 
@@ -112,7 +107,9 @@ Labels are placeholders written for the prototype, and three of the six tests us
 
 | | |
 | --- | --- |
-| ![What-if slider](docs/screenshots/3-what-if.png) | ![Study plan](docs/screenshots/4-plan.png) |
+![Workload screen](docs/screenshots/2-workload.png)
+![What-if slider](docs/screenshots/3-what-if.png)  
+![Study plan](docs/screenshots/4-plan.png) 
 | ![Recharge picks](docs/screenshots/5-recharge.png) | ![Campus Radar](docs/screenshots/7-radar.png) |
 
 ## Architecture
