@@ -8,8 +8,10 @@ corrections feed the personal pace model (agents/pace.py).
 from __future__ import annotations
 
 import json
+import math
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 from .. import llm
 
@@ -61,7 +63,36 @@ def is_major(kind: str, hours: float) -> bool:
     return kind in {"exam", "project", "presentation"} or (kind == "essay" and hours >= 4)
 
 
-def estimate_rules(title: str, description: str = "") -> Estimate:
+CALIBRATION_FILE = Path(__file__).resolve().parent.parent.parent / "data" / "effort_calibration.json"
+_calibration: dict | None = None
+
+
+def load_calibration() -> dict[str, float]:
+    """Per-type hour multipliers learned from the team's labels (scripts/learn_from_labels.py)."""
+    global _calibration
+    if _calibration is None:
+        try:
+            _calibration = json.loads(CALIBRATION_FILE.read_text(encoding="utf-8")).get("multipliers", {})
+        except (OSError, ValueError):
+            _calibration = {}
+    return _calibration
+
+
+def learn_calibration(rows: list[dict], shrink: float = 2.0) -> dict[str, float]:
+    """rows: labeled items with title, description, hours. For each type the rules predict, the
+    multiplier is the average log ratio label/rules, shrunk toward the overall median ratio so a
+    type with few labeled items does not swing far (same idea as the personal pace model)."""
+    logs: dict[str, list[float]] = {}
+    for r in rows:
+        e = estimate_rules(r["title"], r.get("description", ""), calibrate=False)
+        logs.setdefault(e.type, []).append(math.log(max(float(r["hours"]), 0.1) / e.hours))
+    every = sorted(x for v in logs.values() for x in v)
+    overall = every[len(every) // 2] if every else 0.0
+    return {k: round(math.exp((sum(v) + shrink * overall) / (len(v) + shrink)), 3) for k, v in logs.items()}
+
+
+def estimate_rules(title: str, description: str = "", calibrate: bool = True,
+                   calibration: dict[str, float] | None = None) -> Estimate:
     t = title.lower()
     kind, hours, why = "homework", 2.5, "no clear cue, default homework estimate"
     for pattern, typ, base in _RULES:
@@ -78,6 +109,11 @@ def estimate_rules(title: str, description: str = "") -> Estimate:
     if pts and int(pts.group(1)) >= 100 and kind not in ("exam", "admin"):
         hours = round(hours * 1.3, 1)
         why += f"; worth {pts.group(1)} points"
+    if calibrate:
+        mult = (load_calibration() if calibration is None else calibration).get(kind)
+        if mult:
+            hours = min(40.0, max(0.25, round(hours * mult * 4) / 4))
+            why += f"; adjusted x{mult:g} from team-labeled examples"
     return Estimate(kind, hours, is_major(kind, hours), "rules", why)
 
 

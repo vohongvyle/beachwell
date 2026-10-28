@@ -14,7 +14,7 @@ os.environ["BEACHWELL_OFFLINE"] = "1"
 os.environ["DEMO_TODAY"] = "2026-10-12"
 os.environ["SEMESTER_START"] = "2026-08-24"
 
-from beachwell import ical, seed, semester, service  # noqa: E402
+from beachwell import ical, llm, seed, semester, service  # noqa: E402
 from beachwell.agents import deadline, events, forecast, pace, planner, radar, safety  # noqa: E402
 
 TODAY = date(2026, 10, 12)
@@ -66,6 +66,18 @@ class TestDeadlineRules(unittest.TestCase):
         long = deadline.estimate_rules("Essay 2", "10-12 pages").hours
         self.assertGreater(long, short)
         self.assertGreater(deadline.estimate_rules("Project", "200 points").hours, deadline.estimate_rules("Project").hours)
+
+    def test_calibration_from_labels(self):
+        base = deadline.estimate_rules("Quiz 4", calibrate=False).hours
+        self.assertEqual(deadline.estimate_rules("Quiz 4", calibration={"quiz": 2.0}).hours, base * 2)
+        self.assertEqual(deadline.estimate_rules("Quiz 4", calibration={}).hours, base)
+        rows = [{"title": f"Quiz {i}", "description": "", "hours": base * 3} for i in range(2)] + \
+               [{"title": f"Homework {i}", "description": "", "hours": deadline.estimate_rules("Homework", calibrate=False).hours}
+                for i in range(6)]
+        mult = deadline.learn_calibration(rows, shrink=2)
+        self.assertGreater(mult["quiz"], 1.5)      # learned that quizzes take longer...
+        self.assertLess(mult["quiz"], 3.0)         # ...but shrunk, since only 2 quizzes were labeled
+        self.assertAlmostEqual(mult["homework"], 1.0, places=2)
 
     def test_batch_offline_uses_rules(self):
         out = deadline.estimate_batch([{"title": "Quiz 1", "course": "X"}])
@@ -162,6 +174,16 @@ class TestSafety(unittest.TestCase):
         for text in ["this exam is killing me", "I'm dead tired", "midterms are going to be the death of me", ""]:
             self.assertEqual(safety.check(text)["level"], "ok", text)
 
+    def test_flags_hopelessness_finality_and_threats(self):
+        # phrasings added after the team-written set; these exact sentences are not in that set
+        for text in ["I've lost all hope", "you won't ever see me again", "I'm going to end everything tonight",
+                     "I don't deserve to be alive", "I won't let my roommate live", "nothing left worth living for",
+                     "I don't care about anything anymore"]:
+            self.assertTrue(safety.rules_flag(text), text)
+        for text in ["No hope for this group project", "I don't care about this class anymore",
+                     "I'll see you again tomorrow", "I'm hopeless at calculus", "I won't let the professor down"]:
+            self.assertFalse(safety.rules_flag(text), text)
+
     def test_response_is_fixed_text(self):
         r = safety.check("I want to end my life")
         self.assertIn("988", " ".join(c["action"] for c in r["contacts"]))
@@ -178,6 +200,17 @@ class TestEvents(unittest.TestCase):
         evs = [self._ev(1, "music,large-crowd,destress", t), self._ev(2, "yoga,calm,destress,small-group", t)]
         ranked = events.score_events("yoga please, I hate crowds", evs)
         self.assertEqual([e["id"] for _, e in ranked], ["2"])
+
+    def test_learned_profiles_and_stemming(self):
+        t = at(TODAY + timedelta(days=2), 12)
+        rest = {**self._ev(1, "quiet,rest", t, series="rest"), "title": "Quiet room", "description": "Recliners and dim lights."}
+        yoga = {**self._ev(2, "yoga,fitness", t, series="yoga"), "title": "Yoga", "description": "Stretch and breathe."}
+        prof = events.build_profiles([{"interests": "I really need sleep", "gold": ["rest"]},
+                                      {"interests": "stretching and moving", "gold": ["yoga"]}])
+        ranked = events.score_events("so tired, I need sleep", [yoga, rest], profiles=prof)
+        self.assertEqual(ranked[0][1]["series"], "rest")
+        self.assertIn("paint", llm.tokens("painting"))
+        self.assertIn("hike", llm.tokens("hiking"))
 
     def test_time_fit(self):
         mon = semester.week_start(semester.week_of(TODAY) + 1)

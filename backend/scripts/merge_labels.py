@@ -50,9 +50,39 @@ def pearson(x: list[float], y: list[float]) -> float:
     return num / den if den else 1.0
 
 
+def _blank(rows: list[dict], fields: list[str]) -> bool:
+    """True if nobody has started this sheet yet (every listed field is empty)."""
+    return all(not (r.get(f) or "").strip() for r in rows for f in fields)
+
+
+def _single(who: str, sheet: str) -> list[str]:
+    return [f"- Only {who}'s {sheet} is filled in so far, so these labels come from one person and "
+            "agreement (Cohen's kappa) is not measured yet. Run this script again once both sheets are done.", ""]
+
+
 def merge_effort() -> tuple[list[str], list[str]]:
     a, b = read(LAB / "effort_labels_vy.csv"), read(LAB / "effort_labels_deborah.csv")
     problems, report = [], []
+    blank_a, blank_b = _blank(a, ["type", "hours"]), _blank(b, ["type", "hours"])
+    if blank_a and blank_b:
+        return ["effort sheets: nobody has filled them in yet"], report
+    if blank_a or blank_b:
+        who, rows_in = ("Deborah", b) if blank_a else ("Vy", a)
+        for r in rows_in:
+            if r["type"].strip().lower() not in TYPES:
+                problems.append(f"effort item {r['item_id']} ({who}): type must be one of {', '.join(TYPES)}")
+            try:
+                float(r["hours"])
+            except ValueError:
+                problems.append(f"effort item {r['item_id']} ({who}): hours is missing or not a number")
+        if problems:
+            return problems, report
+        rows = [{"title": r["title"], "course": r["course"], "description": r["description"],
+                 "type": r["type"].strip().lower(), "hours": float(r["hours"])} for r in rows_in]
+        with open(OUT / "effort_labels.csv", "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=["title", "course", "description", "type", "hours"])
+            w.writeheader(); w.writerows(rows)
+        return [], ["## Time estimates", "", f"- Items labeled: {len(rows)}"] + _single(who, "time-estimate sheet")
     if len(a) != len(b):
         sys.exit("The two effort sheets have a different number of rows.")
     rows, disagree = [], []
@@ -92,6 +122,24 @@ def merge_personas() -> tuple[list[str], list[str]]:
     a, b = read(LAB / "persona_labels_vy.csv"), read(LAB / "persona_labels_deborah.csv")
     valid = {r["series_id"] for r in read(LAB / "event_choices.csv")}
     problems, out, overlaps, top1 = [], [], [], []
+    picks_f = ["best_event_1", "best_event_2", "best_event_3"]
+    blank_a, blank_b = _blank(a, picks_f), _blank(b, picks_f)
+    if blank_a and blank_b:
+        return ["persona sheets: nobody has filled them in yet"], []
+    if blank_a or blank_b:
+        who, rows_in = ("Deborah", b) if blank_a else ("Vy", a)
+        for r in rows_in:
+            p = [r[f].strip() for f in picks_f if r[f].strip()]
+            bad = [e for e in p if e not in valid]
+            if not p:
+                problems.append(f"persona {r['persona_id']} ({who}): pick at least one event")
+            if bad:
+                problems.append(f"persona {r['persona_id']} ({who}): unknown event id {', '.join(bad)} (see event_choices.csv)")
+            out.append({"interests": r["what_helps_this_student_recharge"], "gold": list(dict.fromkeys(p))})
+        if problems:
+            return problems, []
+        json.dump(out, open(OUT / "event_personas.json", "w", encoding="utf-8"), indent=1)
+        return [], ["## Event picks for sample students", "", f"- Personas labeled: {len(out)}"] + _single(who, "event-pick sheet")
     for x, y in zip(a, b):
         picks = []
         for who, r in (("Vy", x), ("Deborah", y)):
@@ -129,7 +177,7 @@ if __name__ == "__main__":
         if len(problems) > 12:
             print(f"  ... and {len(problems) - 12} more. Fill in every row of your sheets in labeling/.")
         sys.exit(1)
-    report = ["# Labeling agreement", "", "Vy and Deborah labeled the same items independently.", ""] + r1 + r2
+    report = ["# Labeling agreement", "", "Vy and Deborah label the same items independently.", ""] + r1 + r2
     (LAB / "agreement_report.md").write_text("\n".join(report) + "\n", encoding="utf-8")
     print("\n".join(report))
     print("Final labels written to eval/data/. Now run: python eval/evaluate.py")

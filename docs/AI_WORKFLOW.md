@@ -59,6 +59,7 @@ All calls go through `backend/beachwell/llm.py`, using the Gemini REST API with 
 * **Event Recommender:** hybrid retrieval (embeddings plus literal-word overlap), free-time fitting for short and drop-in events, crowd preference, diversity across weeks, and projection of recurring past-term events as "expected" (`agents/events.py`).
 * **Campus Radar:** k-anonymous aggregation (no group under 10), overload alerts, and deadline-collision detection with a what-if for moving a deadline one week (`agents/radar.py`).
 * **Canvas integration:** a dependency-free iCalendar reader and writer, with an allow-list for feed hosts and a private-address check (`ical.py`, `service.py`).
+* **Learning from the team's labels:** `scripts/learn_from_labels.py` learns event profiles (relevance feedback from labeled sample students) and a per-type effort calibration (shrunk log-ratio, like the pace model). The evaluation tests both leave-one-out.
 * **Evaluation:** six experiments, each against a non-AI baseline (`eval/evaluate.py`).
 
 ## Limitations
@@ -67,4 +68,4 @@ All calls go through `backend/beachwell/llm.py`, using the Gemini REST API with 
 * Effort estimates reflect an "average undergraduate"; the pace model corrects this only after a student logs hours.
 * The offline embedding is a hashed bag of words with a small synonym list. It is a fallback, not a substitute for semantic embeddings.
 * The safety screen is a routing aid, not a clinical assessment. It is tuned for recall, so it will sometimes show crisis resources to a student who is fine.
-* Placeholder evaluation labels were written by one person; they need independent re-labeling.
+* Evaluation labels so far come from one team member (Deborah); a second set is needed to measure agreement. Learned profiles and calibration reflect the labelers' judgment and should be re-learned as more labels arrive.

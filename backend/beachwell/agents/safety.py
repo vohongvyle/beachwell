@@ -26,7 +26,23 @@ CRISIS_PATTERNS = [
     r"\b(hurt|kill|shoot|stab) (someone|somebody|people|him|her|them)\b",
     r"\bnobody would (care|notice) if i (was|were) gone\b", r"\bdisappear forever\b",
 ]
-_RE = [re.compile(p, re.IGNORECASE) for p in CRISIS_PATTERNS]
+# Added Oct 2026 after Deborah's team-written set showed the Phase 1 rules missed 9 of 15
+# help-needed messages: hopelessness, "ending everything", not needing to exist, "you might not
+# see me again", and threats to someone else. Written as general patterns, not the exact sentences.
+PATTERNS_OCT_2026 = [
+    r"\bend(ing)? everything\b", r"\bend (it|everything|my suffering) (after|before|when|once|tonight|soon)\b",
+    r"\b(no|lost all|without|any) (more )?hope (in|for|left in) (my life|life|living|the future|me)\b", r"\bno more hope\b", r"\blost all hope\b",
+    r"\bhopeless\b(?! (at|with) )",
+    r"\b(don'?t|do not|no longer) (need|want|deserve) to (exist|be here|be alive|live|be in this world)\b",
+    r"\b(no|any|the only) way out\b.*\b(die|dying|death|dead|end it)\b", r"\bexcept (to )?die\b",
+    r"\b(don'?t|do not) care (about )?(anything|everything|anyone) any ?more\b",
+    r"\b(won'?t|will not|not going to|wouldn'?t) let (him|her|them|the professor|the teacher|my \w+) live\b",
+    r"\b(might|may|will|won'?t|wouldn'?t)( not)? (ever )?see me (again|tomorrow|anymore)\b",
+    r"\bnothing (left )?(in my life )?worth (staying alive|living|being alive|being here) for\b",
+    r"\bworth staying alive\b", r"\b(end|ending) my suffering\b",
+]
+_RE_V1 = [re.compile(p, re.IGNORECASE) for p in CRISIS_PATTERNS]
+_RE = _RE_V1 + [re.compile(p, re.IGNORECASE) for p in PATTERNS_OCT_2026]
 
 RESOURCES = {
     "level": "crisis",
@@ -50,8 +66,9 @@ Return JSON: {{"label": "crisis" or "ok"}}
 Message: {text}"""
 
 
-def rules_flag(text: str) -> bool:
-    return any(r.search(text or "") for r in _RE)
+def rules_flag(text: str, version: int = 2) -> bool:
+    """version=1 reproduces the Phase 1 rules, for the evaluation only."""
+    return any(r.search(text or "") for r in (_RE_V1 if version == 1 else _RE))
 
 
 def check(text: str) -> dict:

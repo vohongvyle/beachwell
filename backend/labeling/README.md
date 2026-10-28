@@ -34,6 +34,11 @@ The first command checks that every cell is filled, measures how much you agree,
 
 Until you finish, the project uses draft labels written for the prototype (kept in `eval/data/draft/`).
 
-## 4. Fresh safety messages (about 1 hour, together)
+## 4. Safety messages
 
-Our safety rules were adjusted using `eval/data/safety_messages.csv`, so testing on that same set is too easy. Write a **new** set in `safety_messages_team.csv`: 30 rows with `label` = `ok` (everyday stress, jokes, "this exam is killing me") and 30 rows with `label` = `crisis` (messages where someone should be shown help). Write them yourselves; do not copy real posts from the internet. `eval/evaluate.py` scores this set separately as the honest, unseen test.
+Our safety rules were first written against `eval/data/safety_messages.csv`, so testing on that set is too easy.
+
+* **Deborah's set (done):** `safety_messages_team.csv`, 15 `ok` and 15 `crisis` rows. On its first, unseen run the Phase 1 rules caught only 6 of the 15 help-needed messages. Its misses were turned into general patterns in `agents/safety.py`, so this set is now a development set.
+* **Vy's set (to do, about 30 minutes):** write 15 `ok` rows (everyday stress, jokes, "this exam is killing me") and 15 `crisis` rows (messages where someone should be shown help) in `safety_messages_unseen.csv`. Do not look at `agents/safety.py` or Deborah's set first, and never change the rules after seeing this set's results. `eval/evaluate.py` scores it as the honest, unseen test.
+
+Write the messages yourself; do not copy real posts from the internet.

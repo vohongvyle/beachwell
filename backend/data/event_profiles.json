@@ -1,0 +1,270 @@
+{
+ "srwc-yoga": [
+  [
+   "I love yoga and stretching. Quiet places help me calm down.",
+   1.0
+  ],
+  [
+   "I need to move and sweat when stressed. Gym, cardio, music.",
+   0.5
+  ],
+  [
+   "Exercise, but nothing too intense. Stretching is good.",
+   1.0
+  ]
+ ],
+ "rest-room": [
+  [
+   "I love yoga and stretching. Quiet places help me calm down.",
+   0.667
+  ],
+  [
+   "I'm exhausted and just need to rest or nap.",
+   1.0
+  ],
+  [
+   "I'm an introvert. Something calm and small.",
+   1.0
+  ],
+  [
+   "Sleep. I really need sleep.",
+   1.0
+  ]
+ ],
+ "study-jam": [
+  [
+   "I love yoga and stretching. Quiet places help me calm down.",
+   0.5
+  ],
+  [
+   "I study best with other people around and coffee.",
+   1.0
+  ],
+  [
+   "I want to feel less overwhelmed and maybe talk to someone.",
+   0.5
+  ]
+ ],
+ "srwc-zumba": [
+  [
+   "I need to move and sweat when stressed. Gym, cardio, music.",
+   1.0
+  ],
+  [
+   "I want to make friends, I'm new and a bit lonely.",
+   0.5
+  ],
+  [
+   "Games and having fun with people.",
+   0.667
+  ],
+  [
+   "I'd like to dance.",
+   1.0
+  ]
+ ],
+ "srwc-cycle": [
+  [
+   "I need to move and sweat when stressed. Gym, cardio, music.",
+   0.667
+  ]
+ ],
+ "asi-puppies": [
+  [
+   "Dogs make everything better.",
+   1.0
+  ],
+  [
+   "Animals and fresh air.",
+   1.0
+  ]
+ ],
+ "caps-mindful": [
+  [
+   "I'm anxious before exams and want practical tips.",
+   1.0
+  ],
+  [
+   "Meditation and mindfulness.",
+   1.0
+  ],
+  [
+   "Talking with other students about stress and how they manage time.",
+   0.667
+  ],
+  [
+   "I want to feel less overwhelmed and maybe talk to someone.",
+   0.667
+  ]
+ ],
+ "noon-jazz": [
+  [
+   "I'm anxious before exams and want practical tips.",
+   0.667
+  ],
+  [
+   "I want to make friends, I'm new and a bit lonely.",
+   0.667
+  ],
+  [
+   "Live music, especially jazz.",
+   1.0
+  ],
+  [
+   "Music and art, something creative and chill.",
+   0.667
+  ]
+ ],
+ "garden-walk": [
+  [
+   "I'm anxious before exams and want practical tips.",
+   0.5
+  ],
+  [
+   "Nature and hiking. I hate big crowds.",
+   0.667
+  ],
+  [
+   "Being outdoors and walking.",
+   0.667
+  ],
+  [
+   "Exercise, but nothing too intense. Stretching is good.",
+   0.667
+  ],
+  [
+   "Animals and fresh air.",
+   0.667
+  ]
+ ],
+ "board-games": [
+  [
+   "I want to make friends, I'm new and a bit lonely.",
+   1.0
+  ],
+  [
+   "Games and having fun with people.",
+   1.0
+  ],
+  [
+   "Bowling or arcade games between classes.",
+   0.667
+  ]
+ ],
+ "art-night": [
+  [
+   "Painting and drawing relax me.",
+   1.0
+  ],
+  [
+   "Live music, especially jazz.",
+   0.667
+  ],
+  [
+   "Crafts and creative stuff, plus snacks.",
+   0.5
+  ],
+  [
+   "Music and art, something creative and chill.",
+   1.0
+  ]
+ ],
+ "sunrise-hike": [
+  [
+   "Nature and hiking. I hate big crowds.",
+   1.0
+  ],
+  [
+   "Games and having fun with people.",
+   0.5
+  ],
+  [
+   "Being outdoors and walking.",
+   1.0
+  ],
+  [
+   "Animals and fresh air.",
+   0.5
+  ]
+ ],
+ "sound-bath": [
+  [
+   "I'm exhausted and just need to rest or nap.",
+   0.667
+  ],
+  [
+   "Live music, especially jazz.",
+   0.5
+  ],
+  [
+   "Sleep. I really need sleep.",
+   0.667
+  ]
+ ],
+ "beach-pantry": [
+  [
+   "Free food please, I'm broke and hungry.",
+   1.0
+  ]
+ ],
+ "asi-midterm-recharge": [
+  [
+   "Free food please, I'm broke and hungry.",
+   0.667
+  ],
+  [
+   "Crafts and creative stuff, plus snacks.",
+   1.0
+  ],
+  [
+   "I'm an introvert. Something calm and small.",
+   0.5
+  ],
+  [
+   "Music and art, something creative and chill.",
+   0.5
+  ]
+ ],
+ "asi-finals-week": [
+  [
+   "Free food please, I'm broke and hungry.",
+   0.5
+  ],
+  [
+   "Crafts and creative stuff, plus snacks.",
+   0.667
+  ]
+ ],
+ "caps-test-anxiety": [
+  [
+   "Meditation and mindfulness.",
+   0.667
+  ]
+ ],
+ "ocean-stress-less": [
+  [
+   "Meditation and mindfulness.",
+   0.5
+  ],
+  [
+   "Talking with other students about stress and how they manage time.",
+   1.0
+  ],
+  [
+   "I want to feel less overwhelmed and maybe talk to someone.",
+   1.0
+  ]
+ ],
+ "library-coloring": [
+  [
+   "I'm an introvert. Something calm and small.",
+   0.667
+  ]
+ ],
+ "bowling": [
+  [
+   "Bowling or arcade games between classes.",
+   1.0
+  ]
+ ]
+}

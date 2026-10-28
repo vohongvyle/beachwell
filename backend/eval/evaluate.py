@@ -45,13 +45,20 @@ def eval_effort() -> dict:
     methods = {
         "Constant 3 h per deadline (baseline)": lambda r: ("homework", 3.0),
         "Type keyword only (baseline)": lambda r: _type_only(r["title"]),
-        "BeachWell rules (title + description cues)": lambda r: (lambda e: (e.type, e.hours))(
-            deadline.estimate_rules(r["title"], r["description"])),
+        "BeachWell rules, Phase 1 (title + description cues)": lambda r: (lambda e: (e.type, e.hours))(
+            deadline.estimate_rules(r["title"], r["description"], calibrate=False)),
     }
     out = {"n": len(rows), "methods": {}}
     for name, fn in methods.items():
         preds = [fn(r) for r in rows]
         out["methods"][name] = _effort_metrics(rows, preds)
+    # calibration learned from the other 59 items only (leave-one-out)
+    preds = []
+    for i, r in enumerate(rows):
+        cal = deadline.learn_calibration(rows[:i] + rows[i + 1:])
+        e = deadline.estimate_rules(r["title"], r["description"], calibration=cal)
+        preds.append((e.type, e.hours))
+    out["methods"]["BeachWell rules + calibration from team labels (leave-one-out)"] = _effort_metrics(rows, preds)
     if llm.mode() == "gemini":
         ests = deadline.estimate_batch([{"title": r["title"], "course": r["course"], "description": r["description"]}
                                         for r in rows])
@@ -228,53 +235,71 @@ def eval_planner(students: int = 20) -> dict:
 # ------------------------------------------------------------------ E. event recommendations
 
 def eval_events() -> dict:
+    """Rank all catalog programs (one session each) for every labeled sample student.
+
+    Metrics: Precision@3; "Found@3" = gold events in the top 3 / min(3, number of gold events),
+    which does not punish a student who only had one good option; Hit@1; MRR (1 / rank of the
+    first good pick). Learned profiles are always leave-one-out: a student is never scored with
+    profiles learned from their own labels.
+    """
     personas = json.load(open(HERE / "data" / "event_personas.json", encoding="utf-8"))
-    wk_start, wk_end = semester.week_range(9)
     pool, seen = [], set()
-    for e in seed.build_events():
-        d = e["start"][:10]
-        if wk_start.isoformat() <= d <= wk_end.isoformat() and e["series"] not in seen:
+    for e in sorted(seed.build_events(), key=lambda e: e["start"]):
+        if e["series"] not in seen:
             seen.add(e["series"])
             pool.append(e)
     freq = Counter(e["series"] for e in seed.build_events())
     rng = random.Random(RNG_SEED)
 
-    def keyword(interests):
+    def keyword(i, interests):
         said = set(llm._TOKEN_RE.findall(interests.lower()))
         return sorted(pool, key=lambda e: -len(said & set(llm._TOKEN_RE.findall(events._event_text(e).lower()))))
 
+    def loo(i):
+        return events.build_profiles([p for k, p in enumerate(personas) if k != i])
+
+    def shuffled(i, interests):
+        x = pool[:]
+        rng.shuffle(x)
+        return x
+
     methods = {
-        "Random (baseline, expected)": None,
-        "Most frequent programs (popularity baseline)": lambda i: sorted(pool, key=lambda e: -freq[e["series"]]),
+        "Random order (baseline, average of 200 shuffles)": shuffled,
+        "Most frequent programs (popularity baseline)": lambda i, t: sorted(pool, key=lambda e: -freq[e["series"]]),
         "Keyword overlap (baseline)": keyword,
-        "BeachWell offline (hashed embeddings + rules)": lambda i: [e for _, e in events.score_events(i, pool)],
+        "BeachWell v1 (Phase 1 scoring)": lambda i, t: [e for _, e in events.score_events(t, pool, profiles={}, generic_query=True, w_destress=0.10)],
+        "BeachWell v2 without learned profiles": lambda i, t: [e for _, e in events.score_events(t, pool, profiles={})],
+        "BeachWell v2 with learned profiles (leave-one-out)": lambda i, t: [e for _, e in events.score_events(t, pool, profiles=loo(i))],
     }
+
+    def score(ranked_by_persona):
+        p3, f3, hit1, mrr = [], [], [], []
+        for per, ranked in ranked_by_persona:
+            gold = set(per["gold"])
+            top = set(ranked[:3]) & gold
+            p3.append(len(top) / 3)
+            f3.append(len(top) / min(3, len(gold)))
+            hit1.append(float(bool(ranked) and ranked[0] in gold))
+            mrr.append(next((1 / (k + 1) for k, s in enumerate(ranked) if s in gold), 0.0))
+        return {"precision_at_3": round(mean(p3), 3), "found_at_3": round(mean(f3), 3),
+                "hit_at_1": round(mean(hit1), 3), "mrr": round(mean(mrr), 3)}
+
     out = {"personas": len(personas), "pool": len(pool), "methods": {}}
     for name, fn in methods.items():
-        p3, hit1 = [], []
-        for per in personas:
-            gold = set(per["gold"])
-            if fn is None:
-                p3.append(len(gold & seen) / len(pool))
-                hit1.append(len(gold & seen) / len(pool))
-                continue
-            ranked = [e["series"] for e in fn(per["interests"])]
-            p3.append(len(set(ranked[:3]) & gold) / 3)
-            hit1.append(float(bool(ranked) and ranked[0] in gold))
-        out["methods"][name] = {"precision_at_3": round(mean(p3), 3), "hit_at_1": round(mean(hit1), 3)}
+        reps = 200 if fn is shuffled else 1
+        runs = [score([(per, [e["series"] for e in fn(i, per["interests"])]) for i, per in enumerate(personas)]) for _ in range(reps)]
+        out["methods"][name] = {k: round(mean(r[k] for r in runs), 3) for k in runs[0]}
     if llm.mode() == "gemini":
-        p3, hit1 = [], []
-        for per in personas:
-            ranked = [e for _, e in events.score_events(per["interests"], pool)]
+        rows = []
+        for i, per in enumerate(personas):
+            ranked = [e for _, e in events.score_events(per["interests"], pool, profiles=loo(i))]
             week = {"week": 9, "level": "Overload", "reasons": ["3 major deadlines within 4 days"], "label": ""}
             picks = events._rerank_online(per["interests"], week, [(0, e) for e in ranked[:8]]) or []
             ids = [p["id"] for p in picks]
-            series = [next(e["series"] for e in pool if e["id"] == i) for i in ids]
-            p3.append(len(set(series[:3]) & set(per["gold"])) / 3)
-            hit1.append(float(bool(series) and series[0] in per["gold"]))
-        out["methods"]["BeachWell + Gemini (embeddings and re-ranking)"] = {"precision_at_3": round(mean(p3), 3),
-                                                                            "hit_at_1": round(mean(hit1), 3)}
-    _ = rng
+            series = [next(e["series"] for e in pool if e["id"] == x) for x in ids]
+            rest = [e["series"] for e in ranked if e["series"] not in series]
+            rows.append((per, series + rest))
+        out["methods"]["BeachWell v2 + Gemini re-ranking"] = score(rows)
     return out
 
 
@@ -285,22 +310,32 @@ def eval_safety() -> dict:
     crisis = [r["text"] for r in rows if r["label"] == "crisis"]
     ok = [r["text"] for r in rows if r["label"] == "ok"]
     res = {"messages": len(rows), "crisis": len(crisis), "ok": len(ok), "methods": {}}
-    res["methods"]["Rules only"] = {
+    res["methods"]["Rules only, prototype set"] = {
         "crisis_recall": round(mean(safety.rules_flag(t) for t in crisis), 3),
         "false_alarm_rate": round(mean(safety.rules_flag(t) for t in ok), 3),
         "missed": [t for t in crisis if not safety.rules_flag(t)],
     }
-    fresh = HERE.parent / "labeling" / "safety_messages_team.csv"
-    if fresh.exists():
-        frows = [r for r in csv.DictReader(open(fresh, encoding="utf-8-sig")) if r.get("text", "").strip()]
-        fc = [r["text"] for r in frows if r["label"].strip().lower() == "crisis"]
-        fo = [r["text"] for r in frows if r["label"].strip().lower() == "ok"]
-        if fc and fo:
-            res["methods"]["Rules only, team-written unseen set"] = {
-                "crisis_recall": round(mean(safety.rules_flag(t) for t in fc), 3),
-                "false_alarm_rate": round(mean(safety.rules_flag(t) for t in fo), 3),
-                "missed": [t for t in fc if not safety.rules_flag(t)],
-            }
+    def load(path):
+        if not path.exists():
+            return [], []
+        rr = [r for r in csv.DictReader(open(path, encoding="utf-8-sig")) if r.get("text", "").strip()]
+        return ([r["text"] for r in rr if r["label"].strip().lower() == "crisis"],
+                [r["text"] for r in rr if r["label"].strip().lower() == "ok"])
+
+    def rate(c, o, version=2):
+        return {"crisis_recall": round(mean(safety.rules_flag(t, version) for t in c), 3),
+                "false_alarm_rate": round(mean(safety.rules_flag(t, version) for t in o), 3),
+                "missed": [t for t in c if not safety.rules_flag(t, version)], "n": len(c) + len(o)}
+
+    lab = HERE.parent / "labeling"
+    tc, to = load(lab / "safety_messages_team.csv")
+    if tc and to:
+        # Deborah's set was unseen when the Phase 1 rules met it; it was then used to add patterns.
+        res["methods"]["Phase 1 rules, Deborah's set (first, unseen run)"] = rate(tc, to, version=1)
+        res["methods"]["Updated rules, Deborah's set (used to fix the rules)"] = rate(tc, to)
+    uc, uo = load(lab / "safety_messages_unseen.csv")
+    if uc and uo:
+        res["methods"]["Updated rules, Vy's set (unseen test)"] = rate(uc, uo)
     if llm.mode() == "gemini":
         flags_c = [safety.check(t)["level"] == "crisis" for t in crisis]
         flags_o = [safety.check(t)["level"] == "crisis" for t in ok]
@@ -327,9 +362,10 @@ def main() -> None:
     md = [f"# BeachWell evaluation results\n\nMode: **{results['mode']}** "
           f"({'Gemini models' if results['mode'] == 'gemini' else 'no API key; rules and hashed embeddings'}). "
           "Re-run with `python eval/evaluate.py`.\n",
-          "> Labels in `eval/data/` are placeholders written by the prototype author. Before the final report, "
-          "two team members should re-label them independently and report agreement. Crunch detection, pace "
-          "learning and the planner use synthetic semesters.\n",
+          "> Effort and event labels in `eval/data/` come from the team's labeling sheets (see "
+          "`labeling/agreement_report.md`; so far only Deborah's sheets are filled in, so agreement is not measured yet). "
+          "Anything learned from labels is tested leave-one-out. Crunch detection, pace learning and the planner use "
+          "synthetic semesters.\n",
           f"## A. Effort estimation ({e['n']} labeled Canvas items)\n",
           _table(["Method", "Mean abs. error (h)", "Median abs. error (h)", "Type accuracy", "Major-deadline accuracy"],
                  [[k, v["mae_hours"], v["median_abs_error"], v["type_accuracy"], v["major_accuracy"]]
@@ -349,12 +385,17 @@ def main() -> None:
                    pl["overload_weeks_per_student"]["with_plan"]]]),
           f"\nRule violations across all plans: **{pl['rule_violations']}**. Share of estimated hours placed in "
           f"study blocks: **{round(pl['share_of_hours_scheduled'] * 100)}%** (the rest did not fit before its due time).\n",
-          f"## E. Event recommendations ({ev['personas']} personas, {ev['pool']} programs in one week)\n",
-          _table(["Method", "Precision@3", "Hit@1"],
-                 [[k, v["precision_at_3"], v["hit_at_1"]] for k, v in ev["methods"].items()]),
-          f"\n## F. Safety screen ({sf['crisis']} help-needed and {sf['ok']} everyday-stress messages)\n\n"
-          "The rules were revised after a first run on this set (crisis recall rose from 0.71 to 1.0), so these "
-          "numbers are optimistic. Measure again on a fresh, team-written set before quoting them.\n",
+          f"## E. Event recommendations ({ev['personas']} labeled sample students, all {ev['pool']} catalog programs)\n\n"
+          "Found@3 = good picks in the top 3 out of the most that were possible (a student with one good option counts as 1/1). "
+          "MRR = 1 / position of the first good pick. Learned profiles are tested leave-one-out.\n",
+          _table(["Method", "Precision@3", "Found@3", "Hit@1", "MRR"],
+                 [[k, v["precision_at_3"], v["found_at_3"], v["hit_at_1"], v["mrr"]] for k, v in ev["methods"].items()]),
+          "\n## F. Safety screen\n\n"
+          f"The first row is the prototype set ({sf['crisis']} help-needed, {sf['ok']} everyday-stress messages) that the rules "
+          "were written against, so it is optimistic. Deborah's team-written set was unseen the first time: the Phase 1 rules "
+          "caught only some of its help-needed messages. Those misses were then turned into general patterns, so that set is "
+          "now a development set. The honest test is Vy's set in `labeling/safety_messages_unseen.csv`, written without "
+          "looking at the rules; it is scored here once it exists.\n",
           _table(["Method", "Crisis recall", "False-alarm rate", "Missed"],
                  [[k, v["crisis_recall"], v["false_alarm_rate"], "; ".join(v["missed"]) or "none"]
                   for k, v in sf["methods"].items()]),

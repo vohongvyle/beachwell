@@ -5,9 +5,17 @@ Pipeline for each Heavy or Overload week:
      semesters (a recurring series, e.g. finals-week activities, that has not been posted yet).
   2. Time-fit filter: the event must not overlap a class or a planned study block.
   3. Score = cosine similarity(student interests, event text)
-             + 0.10 if it is a de-stress event, + 0.05 if it is short,
+             + 0.6 x cosine similarity(student interests, the event's learned profile)
+             + 0.06 per word the student wrote that the event covers (max 3)
+             + 0.05 if it is a de-stress event, + 0.05 if it is short,
              - 0.15 for big crowds when the student says they dislike crowds,
              - 0.05 if it is only "expected".
+     The learned profile of an event is the (rank-weighted) average of what labeled sample
+     students who picked that event wrote (data/event_profiles.json, built by
+     scripts/learn_event_profiles.py). Events nobody has labeled use their own text instead.
+     The student's words are used as written; a generic "relax, stress relief" phrase is
+     added only when they wrote almost nothing, because it pulled every query toward the
+     same generic stress events.
   4. Online, Gemini re-ranks the top 8 and writes the one-line reasons; offline,
      reasons come from a template built from the matched terms and the free slot.
 """
@@ -16,6 +24,7 @@ from __future__ import annotations
 import json
 import re
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 from .. import llm, semester
 from ..ical import LOCAL_TZ
@@ -107,32 +116,90 @@ def _event_text(ev: dict) -> str:
     return f"{ev['title']}. {ev['description']} Tags: {ev['tags'].replace(',', ', ')}"
 
 
-def score_events(interests: str, candidates: list[dict]) -> list[tuple[float, dict]]:
+PROFILE_FILE = Path(__file__).resolve().parent.parent.parent / "data" / "event_profiles.json"
+GENERIC_QUERY = " take a break, relax, recharge, stress relief"
+W_PROFILE, W_WORDS, W_DESTRESS, W_SHORT = 0.6, 0.06, 0.05, 0.05
+REPEAT_PENALTY = 0.15  # per earlier week that already suggested the same program, so picks vary across weeks
+_profiles_cache: dict | None = None
+
+
+def load_profiles() -> dict[str, list[list]]:
+    """{series_id: [[what a sample student wrote, weight], ...]} learned from labeled personas."""
+    global _profiles_cache
+    if _profiles_cache is None:
+        try:
+            _profiles_cache = json.loads(PROFILE_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            _profiles_cache = {}
+    return _profiles_cache
+
+
+def build_profiles(personas: list[dict]) -> dict[str, list[list]]:
+    """Learn event profiles from labeled personas: each pick adds what that student wrote,
+    weighted 1, 0.67, 0.5 for first, second, third choice (Rocchio-style relevance feedback)."""
+    prof: dict[str, list[list]] = {}
+    for p in personas:
+        for rank, series in enumerate(p["gold"]):
+            prof.setdefault(series, []).append([p["interests"], round(1 / (1 + 0.5 * rank), 3)])
+    return prof
+
+
+def _profile_vectors(candidates: list[dict], profiles: dict, event_vecs):
+    """One unit vector per candidate: its learned profile, or its own text when it has none."""
+    import numpy as np
+    texts = sorted({t for e in candidates for t, _ in profiles.get(e["series"] or "", [])})
+    tv = dict(zip(texts, llm.embed(texts))) if texts else {}
+    out = []
+    for e, own in zip(candidates, event_vecs):
+        items = profiles.get(e["series"] or "", [])
+        if not items:
+            out.append(own)
+            continue
+        v = sum(w * tv[t] for t, w in items)
+        n = float(np.linalg.norm(v))
+        out.append(v / n if n else own)
+    return np.array(out)
+
+
+def score_events(interests: str, candidates: list[dict], profiles: dict | None = None,
+                 generic_query: bool = False, w_profile: float = W_PROFILE,
+                 w_destress: float = W_DESTRESS) -> list[tuple[float, dict]]:
+    """Rank candidate events for a student. `profiles` defaults to the learned file;
+    pass {} to turn profiles off (used by the evaluation to compare versions)."""
     if not candidates:
         return []
-    query = (interests or "") + " take a break, relax, recharge, stress relief"
-    vecs = llm.embed([query] + [_event_text(e) for e in candidates])
-    sims = vecs[1:] @ vecs[0]
-    crowd_averse = bool(CROWD_AVERSE.search(interests or ""))
+    profiles = load_profiles() if profiles is None else profiles
     said = set(_said_words(interests))
+    query = (interests or "") + (GENERIC_QUERY if generic_query or len(said) < 1 else "")
+    vecs = llm.embed([query] + [_event_text(e) for e in candidates])
+    q, ev_vecs = vecs[0], vecs[1:]
+    sims = ev_vecs @ q
+    prof_sims = (_profile_vectors(candidates, profiles, ev_vecs) @ q) if (profiles and w_profile) else sims * 0
+    crowd_averse = bool(CROWD_AVERSE.search(interests or ""))
     scored = []
-    for sim, ev in zip(sims, candidates):
+    for sim, psim, ev in zip(sims, prof_sims, candidates):
         tags = set(ev["tags"].split(","))
         if crowd_averse and "large-crowd" in tags and not _mentioned(ev, interests):
             continue  # respect a stated dislike unless the event matches something they asked for
         s, e = datetime.fromisoformat(ev["start"]), datetime.fromisoformat(ev["end"])
-        # hybrid retrieval: semantic similarity plus a small bonus for words the student literally wrote
+        # hybrid retrieval: semantic similarity, the learned profile, and words the student literally wrote
         overlap = len(said & {_stem(t) for t in llm._TOKEN_RE.findall(_event_text(ev).lower())})
-        bonus = 0.06 * min(overlap, 3) + 0.10 * ("destress" in tags) + 0.05 * ((e - s) <= timedelta(hours=1.5))
+        bonus = (W_WORDS * min(overlap, 3) + w_destress * ("destress" in tags)
+                 + W_SHORT * ((e - s) <= timedelta(hours=1.5)))
         bonus -= 0.15 * (crowd_averse and "large-crowd" in tags)
         bonus -= 0.05 * bool(ev.get("expected"))
-        scored.append((float(sim) + bonus, ev))
+        scored.append((float(sim) + w_profile * float(psim) + bonus, ev))
     scored.sort(key=lambda x: -x[0])
     return scored
 
 
 def _stem(word: str) -> str:
-    return word[:-1] if word.endswith("s") and len(word) > 3 else word
+    """Same light stemming on both sides: drawings -> drawing -> draw, painting -> paint."""
+    if word.endswith("s") and len(word) > 3:
+        word = word[:-1]
+    if word.endswith("ing") and len(word) > 5:
+        word = word[:-3]
+    return word
 
 
 _NOT_INTERESTS = {"crowd", "crowds", "hate", "drain", "drains", "rather", "something", "make", "outside", "major",
@@ -147,7 +214,9 @@ def _said_words(interests: str) -> list[str]:
 def _mentioned(ev: dict, interests: str) -> list[str]:
     """Words the student actually wrote (no synonyms) that this event covers."""
     event_words = {_stem(t) for t in llm._TOKEN_RE.findall(_event_text(ev).lower())}
-    return [w for w in dict.fromkeys(_said_words(interests)) if w in event_words]
+    words = [w for w in llm._TOKEN_RE.findall((interests or "").lower())
+             if w not in llm._STOP and w not in _NOT_INTERESTS and len(w) > 3]
+    return [w for w in dict.fromkeys(words) if _stem(w) in event_words]  # the student's own spelling
 
 
 def _template_reason(ev: dict, interests: str, week: dict) -> str:
@@ -182,7 +251,7 @@ def recommend(interests: str, weeks: list[dict], events: list[dict], classes: li
         start, end = date.fromisoformat(w["start"]), date.fromisoformat(w["end"])
         cands = [e for e in pool if start <= datetime.fromisoformat(e["start"]).date() <= end
                  and fits_free_time(e, classes, blocks)]
-        ranked = sorted(((sc - 0.06 * shown.get(ev["series"] or ev["id"], 0), ev)
+        ranked = sorted(((sc - REPEAT_PENALTY * shown.get(ev["series"] or ev["id"], 0), ev)
                          for sc, ev in score_events(interests, cands)), key=lambda x: -x[0])
         seen_series, top = set(), []
         for score, ev in ranked:

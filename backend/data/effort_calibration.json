@@ -1,0 +1,15 @@
+{
+ "labeled_items": 60,
+ "multipliers": {
+  "quiz": 1.211,
+  "exam": 1.239,
+  "homework": 0.893,
+  "reading": 1.048,
+  "lab": 0.585,
+  "discussion": 0.603,
+  "admin": 1.064,
+  "essay": 0.851,
+  "project": 0.478,
+  "presentation": 0.577
+ }
+}

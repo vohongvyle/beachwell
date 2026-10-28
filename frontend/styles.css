@@ -31,7 +31,7 @@ input[type=range] { accent-color: var(--ink); }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--fog);
+  background: #F3F7F8;
   color: var(--ink);
   font: 400 var(--step-0)/1.55 var(--body);
 }
@@ -49,7 +49,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .topbar {
   display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
   padding: 14px clamp(16px, 4vw, 40px);
-  background: var(--fog);
+  background: #FFFFFF;
   position: sticky; top: 0; z-index: 5;
   border-bottom: 1px solid var(--line);
 }

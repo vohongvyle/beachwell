@@ -1,61 +1,61 @@
 item_id,title,course,description,type,hours
-1,Quiz 3,MATH 380,,,
-2,Weekly Quiz 7,BIOL 211,,,
-3,Midterm Exam,CECS 429,,,
-4,Midterm Exam 1,MATH 247,,,
-5,Midterm 2,PHYS 151,,,
-6,Final Exam,CHEM 220A,cumulative,,
-7,Final Exam,PSY 100,,,
-8,Exam 2,HHS 200,,,
-9,Unit Test 3,NUTR 132,,,
-10,Homework 4,CECS 429,Problem set,,
-11,Homework 9,MATH 380,Problem set,,
-12,HW 2,EE 381,,,
-13,Problem Set 6,PHYS 151,,,
-14,Worksheet 3,ACCT 201,,,
-15,Practice Problems Chapter 5,FIN 300,,,
-16,Assignment 3: Data Cleaning,IS 301,,,
-17,Lab 5,CECS 458,,,
-18,Hands-on Lab 3,CECS 458,,,
-19,Lab Report 2,BIOL 211,Lab write-up,,
-20,Lab Report 4,CHEM 220A,Full write-up with error analysis,,
-21,Pre-lab Quiz 6,CHEM 220A,,,
-22,Reading Response 4,ENGL 317,,,
-23,Reading Reflection 2,PHIL 352,,,
-24,Read Chapter 7,SOC 335,,,
-25,Discussion Post 5,KIN 301,,,
-26,Discussion: Week 3 reply,PSY 100,,,
-27,Forum Post 2,NRSG 300,,,
-28,Introduce Yourself,HIST 172,,,
-29,Syllabus Quiz,COMM 130,,,
-30,Mid-semester Survey,MGMT 425,,,
-31,Essay 1,ENGL 317,4-5 pages,,
-32,Essay 2,PHIL 352,6-8 pages,,
-33,Argumentative Essay,POSC 100,5 pages,,
-34,Short Paper,HIST 172,3 pages,,
-35,Response Paper 2,SOC 335,2 pages,,
-36,Research Paper,SW 340,10-12 pages,,
-37,Final Research Paper,ENGL 317,10-12 pages,,
-38,Research Paper Draft,GEOG 140,8 pages,,
-39,Book Review,HIST 172,,,
-40,Journal Entry 6,KIN 301,,,
-41,Case Study 3,MKTG 300,2 pages,,
-42,Case Analysis 2,MGMT 425,,,
-43,Project Proposal,CECS 491A,2-3 pages,,
-44,Project Milestone 2,EE 381,Working prototype and 4 page report,,
-45,Progress Report,ME 373,,,
-46,Phase 1: Ideation and Feasibility Report,CECS 458,Maximum 4 pages,,
-47,Phase 2: Prototype Progress Report,CECS 458,Prototype and 2 page report,,
-48,Final Project Report,CECS 429,"10-12 pages, 200 points",,
-49,Final Project,ART 130,,,
-50,Group Project Report,FIN 300,8 pages,,
-51,Capstone Prototype Demo,CECS 491A,,,
-52,Group Presentation,MKTG 300,,,
-53,Final Presentation,CE 335,,,
-54,Poster Session,BIOL 211,,,
-55,Pitch Video,CECS 458,10 minute video,,
-56,Studio Critique 2,DESN 131,"Reflection, 1 page",,
-57,Midterm Project,THEA 122,,,
-58,Final Portfolio Project,MUS 190,Portfolio and artist statement,,
-59,Annotated Bibliography,ENGL 317,,,
-60,Concert Report,MUS 190,2 pages,,
+1,Quiz 3,MATH 380,,quiz,5
+2,Weekly Quiz 7,BIOL 211,,quiz,5
+3,Midterm Exam,CECS 429,,exam,10
+4,Midterm Exam 1,MATH 247,,exam,12
+5,Midterm 2,PHYS 151,,exam,10
+6,Final Exam,CHEM 220A,cumulative,exam,20
+7,Final Exam,PSY 100,,exam,20
+8,Exam 2,HHS 200,,exam,8
+9,Unit Test 3,NUTR 132,,quiz,5
+10,Homework 4,CECS 429,Problem set,homework,3
+11,Homework 9,MATH 380,Problem set,homework,3
+12,HW 2,EE 381,,homework,4
+13,Problem Set 6,PHYS 151,,homework,3
+14,Worksheet 3,ACCT 201,,homework,3.5
+15,Practice Problems Chapter 5,FIN 300,,homework,3
+16,Assignment 3: Data Cleaning,IS 301,,homework,4.5
+17,Lab 5,CECS 458,,lab,2
+18,Hands-on Lab 3,CECS 458,,lab,2
+19,Lab Report 2,BIOL 211,Lab write-up,lab,1.5
+20,Lab Report 4,CHEM 220A,Full write-up with error analysis,lab,1.5
+21,Pre-lab Quiz 6,CHEM 220A,,quiz,2
+22,Reading Response 4,ENGL 317,,reading,1
+23,Reading Reflection 2,PHIL 352,,reading,1
+24,Read Chapter 7,SOC 335,,reading,3.5
+25,Discussion Post 5,KIN 301,,discussion,0.5
+26,Discussion: Week 3 reply,PSY 100,,discussion,0.5
+27,Forum Post 2,NRSG 300,,discussion,0.5
+28,Introduce Yourself,HIST 172,,presentation,1
+29,Syllabus Quiz,COMM 130,,quiz,0.5
+30,Mid-semester Survey,MGMT 425,,admin,0.5
+31,Essay 1,ENGL 317,4-5 pages,essay,8
+32,Essay 2,PHIL 352,6-8 pages,essay,10
+33,Argumentative Essay,POSC 100,5 pages,essay,8
+34,Short Paper,HIST 172,3 pages,essay,6
+35,Response Paper 2,SOC 335,2 pages,essay,2
+36,Research Paper,SW 340,10-12 pages,essay,18
+37,Final Research Paper,ENGL 317,10-12 pages,essay,20
+38,Research Paper Draft,GEOG 140,8 pages,essay,4
+39,Book Review,HIST 172,,essay,1.5
+40,Journal Entry 6,KIN 301,,essay,1
+41,Case Study 3,MKTG 300,2 pages,essay,2
+42,Case Analysis 2,MGMT 425,,essay,2.5
+43,Project Proposal,CECS 491A,2-3 pages,essay,2
+44,Project Milestone 2,EE 381,Working prototype and 4 page report,essay,2.5
+45,Progress Report,ME 373,,essay,2
+46,Phase 1: Ideation and Feasibility Report,CECS 458,Maximum 4 pages,essay,4
+47,Phase 2: Prototype Progress Report,CECS 458,Prototype and 2 page report,essay,5
+48,Final Project Report,CECS 429,"10-12 pages, 200 points",essay,6
+49,Final Project,ART 130,,project,5
+50,Group Project Report,FIN 300,8 pages,essay,4
+51,Capstone Prototype Demo,CECS 491A,,presentation,3
+52,Group Presentation,MKTG 300,,presentation,3
+53,Final Presentation,CE 335,,presentation,3
+54,Poster Session,BIOL 211,,presentation,2
+55,Pitch Video,CECS 458,10 minute video,presentation,2
+56,Studio Critique 2,DESN 131,"Reflection, 1 page",essay,1
+57,Midterm Project,THEA 122,,project,6
+58,Final Portfolio Project,MUS 190,Portfolio and artist statement,project,6
+59,Annotated Bibliography,ENGL 317,,homework,1
+60,Concert Report,MUS 190,2 pages,essay,3

@@ -3,16 +3,15 @@
   "interests": "I love yoga and stretching. Quiet places help me calm down.",
   "gold": [
    "srwc-yoga",
-   "caps-mindful",
-   "garden-walk",
-   "rest-room"
+   "rest-room",
+   "study-jam"
   ]
  },
  {
   "interests": "I need to move and sweat when stressed. Gym, cardio, music.",
   "gold": [
-   "srwc-cycle",
    "srwc-zumba",
+   "srwc-cycle",
    "srwc-yoga"
   ]
  },
@@ -25,25 +24,23 @@
  {
   "interests": "I'm anxious before exams and want practical tips.",
   "gold": [
-   "caps-test-anxiety",
-   "ocean-stress-less",
-   "caps-mindful"
+   "caps-mindful",
+   "noon-jazz",
+   "garden-walk"
   ]
  },
  {
   "interests": "I want to make friends, I'm new and a bit lonely.",
   "gold": [
    "board-games",
-   "sunrise-hike",
-   "ocean-stress-less",
-   "asi-midterm-recharge"
+   "noon-jazz",
+   "srwc-zumba"
   ]
  },
  {
   "interests": "Painting and drawing relax me.",
   "gold": [
-   "art-night",
-   "asi-midterm-recharge"
+   "art-night"
   ]
  },
  {
@@ -57,7 +54,7 @@
   "interests": "I'm exhausted and just need to rest or nap.",
   "gold": [
    "rest-room",
-   "caps-mindful"
+   "sound-bath"
   ]
  },
  {
@@ -65,29 +62,31 @@
   "gold": [
    "beach-pantry",
    "asi-midterm-recharge",
-   "asi-puppies"
+   "asi-finals-week"
   ]
  },
  {
   "interests": "Games and having fun with people.",
   "gold": [
    "board-games",
-   "bowling"
+   "srwc-zumba",
+   "sunrise-hike"
   ]
  },
  {
   "interests": "Live music, especially jazz.",
   "gold": [
    "noon-jazz",
-   "srwc-zumba"
+   "art-night",
+   "sound-bath"
   ]
  },
  {
   "interests": "Meditation and mindfulness.",
   "gold": [
    "caps-mindful",
-   "garden-walk",
-   "srwc-yoga"
+   "caps-test-anxiety",
+   "ocean-stress-less"
   ]
  },
  {
@@ -106,32 +105,30 @@
   "interests": "Crafts and creative stuff, plus snacks.",
   "gold": [
    "asi-midterm-recharge",
-   "art-night",
-   "library-coloring"
+   "asi-finals-week",
+   "art-night"
   ]
  },
  {
   "interests": "I'm an introvert. Something calm and small.",
   "gold": [
-   "caps-mindful",
-   "garden-walk",
-   "art-night",
    "rest-room",
-   "library-coloring"
+   "library-coloring",
+   "asi-midterm-recharge"
   ]
  },
  {
   "interests": "Talking with other students about stress and how they manage time.",
   "gold": [
    "ocean-stress-less",
-   "caps-test-anxiety"
+   "caps-mindful"
   ]
  },
  {
   "interests": "Being outdoors and walking.",
   "gold": [
-   "garden-walk",
-   "sunrise-hike"
+   "sunrise-hike",
+   "garden-walk"
   ]
  },
  {
@@ -152,29 +149,31 @@
   "interests": "Animals and fresh air.",
   "gold": [
    "asi-puppies",
-   "sunrise-hike",
-   "garden-walk"
+   "garden-walk",
+   "sunrise-hike"
   ]
  },
  {
   "interests": "I want to feel less overwhelmed and maybe talk to someone.",
   "gold": [
-   "caps-test-anxiety",
    "ocean-stress-less",
-   "caps-mindful"
+   "caps-mindful",
+   "study-jam"
   ]
  },
  {
   "interests": "Sleep. I really need sleep.",
   "gold": [
-   "rest-room"
+   "rest-room",
+   "sound-bath"
   ]
  },
  {
   "interests": "Music and art, something creative and chill.",
   "gold": [
    "art-night",
-   "noon-jazz"
+   "noon-jazz",
+   "asi-midterm-recharge"
   ]
  }
 ]

@@ -1,25 +1,25 @@
 persona_id,what_helps_this_student_recharge,best_event_1,best_event_2,best_event_3
-1,I love yoga and stretching. Quiet places help me calm down.,,,
-2,"I need to move and sweat when stressed. Gym, cardio, music.",,,
-3,Dogs make everything better.,,,
-4,I'm anxious before exams and want practical tips.,,,
-5,"I want to make friends, I'm new and a bit lonely.",,,
-6,Painting and drawing relax me.,,,
-7,Nature and hiking. I hate big crowds.,,,
-8,I'm exhausted and just need to rest or nap.,,,
-9,"Free food please, I'm broke and hungry.",,,
-10,Games and having fun with people.,,,
-11,"Live music, especially jazz.",,,
-12,Meditation and mindfulness.,,,
-13,I'd like to dance.,,,
-14,I study best with other people around and coffee.,,,
-15,"Crafts and creative stuff, plus snacks.",,,
-16,I'm an introvert. Something calm and small.,,,
-17,Talking with other students about stress and how they manage time.,,,
-18,Being outdoors and walking.,,,
-19,Bowling or arcade games between classes.,,,
-20,"Exercise, but nothing too intense. Stretching is good.",,,
-21,Animals and fresh air.,,,
-22,I want to feel less overwhelmed and maybe talk to someone.,,,
-23,Sleep. I really need sleep.,,,
-24,"Music and art, something creative and chill.",,,
+1,I love yoga and stretching. Quiet places help me calm down.,srwc-yoga,rest-room,study-jam
+2,"I need to move and sweat when stressed. Gym, cardio, music.",srwc-zumba,srwc-cycle,srwc-yoga
+3,Dogs make everything better.,asi-puppies,,
+4,I'm anxious before exams and want practical tips.,caps-mindful,noon-jazz,garden-walk
+5,"I want to make friends, I'm new and a bit lonely.",board-games,noon-jazz,srwc-zumba
+6,Painting and drawing relax me.,art-night,,
+7,Nature and hiking. I hate big crowds.,sunrise-hike,garden-walk,
+8,I'm exhausted and just need to rest or nap.,rest-room,sound-bath,
+9,"Free food please, I'm broke and hungry.",beach-pantry,asi-midterm-recharge,asi-finals-week
+10,Games and having fun with people.,board-games,srwc-zumba,sunrise-hike
+11,"Live music, especially jazz.",noon-jazz,art-night,sound-bath
+12,Meditation and mindfulness.,caps-mindful,caps-test-anxiety,ocean-stress-less
+13,I'd like to dance.,srwc-zumba,,
+14,I study best with other people around and coffee.,study-jam,,
+15,"Crafts and creative stuff, plus snacks.",asi-midterm-recharge,asi-finals-week,art-night
+16,I'm an introvert. Something calm and small.,rest-room,library-coloring,asi-midterm-recharge
+17,Talking with other students about stress and how they manage time.,ocean-stress-less,caps-mindful,
+18,Being outdoors and walking.,sunrise-hike,garden-walk,
+19,Bowling or arcade games between classes.,bowling,board-games,
+20,"Exercise, but nothing too intense. Stretching is good.",srwc-yoga,garden-walk,
+21,Animals and fresh air.,asi-puppies,garden-walk,sunrise-hike
+22,I want to feel less overwhelmed and maybe talk to someone.,ocean-stress-less,caps-mindful,study-jam
+23,Sleep. I really need sleep.,rest-room,sound-bath,
+24,"Music and art, something creative and chill.",art-night,noon-jazz,asi-midterm-recharge

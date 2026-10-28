@@ -4,22 +4,28 @@
     "n": 60,
     "methods": {
       "Constant 3 h per deadline (baseline)": {
-        "mae_hours": 4.18,
-        "median_abs_error": 2.25,
-        "type_accuracy": 0.15,
-        "major_accuracy": 0.483
+        "mae_hours": 2.98,
+        "median_abs_error": 2.0,
+        "type_accuracy": 0.133,
+        "major_accuracy": 0.567
       },
       "Type keyword only (baseline)": {
-        "mae_hours": 2.58,
+        "mae_hours": 2.99,
         "median_abs_error": 2.0,
-        "type_accuracy": 0.883,
-        "major_accuracy": 0.917
+        "type_accuracy": 0.733,
+        "major_accuracy": 0.833
       },
-      "BeachWell rules (title + description cues)": {
-        "mae_hours": 1.75,
-        "median_abs_error": 1.0,
-        "type_accuracy": 0.883,
-        "major_accuracy": 0.933
+      "BeachWell rules, Phase 1 (title + description cues)": {
+        "mae_hours": 2.63,
+        "median_abs_error": 2.0,
+        "type_accuracy": 0.733,
+        "major_accuracy": 0.883
+      },
+      "BeachWell rules + calibration from team labels (leave-one-out)": {
+        "mae_hours": 1.92,
+        "median_abs_error": 1.25,
+        "type_accuracy": 0.733,
+        "major_accuracy": 0.883
       }
     }
   },
@@ -44,51 +50,71 @@
     "students": 40,
     "methods": {
       "No personal pace (baseline)": {
-        "first_half": 0.93,
-        "second_half": 1.41
+        "first_half": 0.78,
+        "second_half": 1.28
       },
       "One overall multiplier": {
-        "first_half": 0.79,
-        "second_half": 1.15
+        "first_half": 0.66,
+        "second_half": 1.02
       },
       "BeachWell pace model (per type, shrunk)": {
-        "first_half": 0.64,
-        "second_half": 0.77
+        "first_half": 0.54,
+        "second_half": 0.68
       }
     }
   },
   "planner": {
     "students": 20,
     "rule_violations": 0,
-    "share_of_hours_scheduled": 0.992,
+    "share_of_hours_scheduled": 0.998,
     "peak_week_hours": {
-      "default_schedule": 41.5,
-      "with_plan": 30.1
+      "default_schedule": 36.0,
+      "with_plan": 27.4
     },
     "overload_weeks_per_student": {
-      "default_schedule": 3.15,
-      "with_plan": 1.6
+      "default_schedule": 2.6,
+      "with_plan": 0.95
     }
   },
   "events": {
     "personas": 24,
-    "pool": 18,
+    "pool": 20,
     "methods": {
-      "Random (baseline, expected)": {
-        "precision_at_3": 0.134,
-        "hit_at_1": 0.134
+      "Random order (baseline, average of 200 shuffles)": {
+        "precision_at_3": 0.12,
+        "found_at_3": 0.149,
+        "hit_at_1": 0.118,
+        "mrr": 0.3
       },
       "Most frequent programs (popularity baseline)": {
-        "precision_at_3": 0.083,
-        "hit_at_1": 0.167
+        "precision_at_3": 0.069,
+        "found_at_3": 0.076,
+        "hit_at_1": 0.125,
+        "mrr": 0.268
       },
       "Keyword overlap (baseline)": {
-        "precision_at_3": 0.472,
-        "hit_at_1": 0.625
+        "precision_at_3": 0.389,
+        "found_at_3": 0.514,
+        "hit_at_1": 0.583,
+        "mrr": 0.725
       },
-      "BeachWell offline (hashed embeddings + rules)": {
+      "BeachWell v1 (Phase 1 scoring)": {
+        "precision_at_3": 0.444,
+        "found_at_3": 0.611,
+        "hit_at_1": 0.708,
+        "mrr": 0.824
+      },
+      "BeachWell v2 without learned profiles": {
         "precision_at_3": 0.5,
-        "hit_at_1": 0.792
+        "found_at_3": 0.681,
+        "hit_at_1": 0.875,
+        "mrr": 0.927
+      },
+      "BeachWell v2 with learned profiles (leave-one-out)": {
+        "precision_at_3": 0.542,
+        "found_at_3": 0.736,
+        "hit_at_1": 0.875,
+        "mrr": 0.927
       }
     }
   },
@@ -97,10 +123,32 @@
     "crisis": 30,
     "ok": 30,
     "methods": {
-      "Rules only": {
+      "Rules only, prototype set": {
         "crisis_recall": 1,
         "false_alarm_rate": 0,
         "missed": []
+      },
+      "Phase 1 rules, Deborah's set (first, unseen run)": {
+        "crisis_recall": 0.4,
+        "false_alarm_rate": 0.067,
+        "missed": [
+          "There is no more hope in my life after the professor posted my grade",
+          "I am going to end everything after the semester ends",
+          "I don't need to exist in this world any more",
+          "I don't see any way out of this disastrous semester except to die",
+          "I don't care anything anymore",
+          "I don't see any hope in my life aftertaking the final exam",
+          "I won't let the professor live if he gives me F on my project",
+          "You might not see me again tomorrow",
+          "There's nothing in my life worth staying alive for"
+        ],
+        "n": 30
+      },
+      "Updated rules, Deborah's set (used to fix the rules)": {
+        "crisis_recall": 1,
+        "false_alarm_rate": 0.067,
+        "missed": [],
+        "n": 30
       }
     }
   }

@@ -138,6 +138,12 @@ def tokens(text: str) -> list[str]:
         if t.endswith("s") and len(t) > 3:
             out.append(t[:-1])
         out.extend(SYNONYMS.get(t, []))
+        if t.endswith("ing") and len(t) > 5:
+            # light stemming so "painting", "stretching", "hiking" meet "paint", "stretch", "hike"
+            base = t[:-3]
+            for b in (base, base + "e"):
+                out.append(b)
+                out.extend(SYNONYMS.get(b, []))
     return out
 
 
