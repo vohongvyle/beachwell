@@ -39,7 +39,7 @@ Phase 1 is done: the working prototype (all 7 parts, 32 tests), first evaluation
 
 Both of us should be able to explain the whole system, since questions can go to either person.
 
-> BeachWell plans and recommends. It never diagnoses or gives any health advice.
+BeachWell is a learning project that helps CSULB students plan their workload. It does not provide medical advice
 
 ![Workload screen](docs/screenshots/2-workload.png)
 
