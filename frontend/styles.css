@@ -209,6 +209,8 @@ legend { font-weight: 700; padding: 0 6px; }
 .heat .now { outline: 2px solid var(--ink); outline-offset: 1px; }
 .legend { display: flex; gap: 10px; align-items: center; font-size: var(--step--1); color: var(--ink-soft); margin: 8px 0 0; flex-wrap: wrap; }
 .legend i { width: 22px; height: 12px; border-radius: 3px; display: inline-block; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; margin-right: 6px; }
+.legend s.usual { display: inline-block; width: 0; height: 14px; border-left: 2px dashed var(--ink-soft); }
 .alert { border-left: 4px solid var(--overload); padding: 8px 0 8px 12px; margin: 10px 0; }
 .collision { border-left: 4px solid var(--moderate); padding: 8px 0 8px 12px; margin: 12px 0; }
 

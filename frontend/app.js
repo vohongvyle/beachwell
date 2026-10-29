@@ -211,7 +211,7 @@ async function renderForecast() {
       <div class="outlook">
         <div class="outlook-head"><h2>Workload score, next 7 weeks</h2><span class="small quiet">0 = free week, 100 = overload. Select a week for details.</span></div>
         <div class="bars" id="bars" role="list"></div>
-        <div class="legend">${LEVELS.map((l) => `<span><i style="background:${LEVEL_COLOR[l]}"></i>${l}</span>`).join("")}</div>
+        <div class="legend">${LEVELS.map((l) => `<span><i style="background:${LEVEL_COLOR[l]}"></i>${l}</span>`).join("")}<span class="usual-key" hidden><s class="usual"></s>Score before the change</span></div>
       </div>
     </section>
     <div class="grid2">
@@ -271,6 +271,8 @@ async function runWhatIf() {
   const f = await api(`/api/users/${state.user.id}/forecast`, { method: "POST", body: { extra_lead: state.whatIf.extra, use_plan: state.whatIf.usePlan } });
   state.forecast = f;
   drawForecast(true);
+  const key = document.querySelector(".usual-key");
+  if (key) key.hidden = false;
   const count = (fc) => fc.weeks.filter((w) => w.level === "Overload").length;
   const peak = (fc) => Math.round(Math.max(...fc.weeks.map((w) => w.score)));
   const before = count(state.base), after = count(f);
