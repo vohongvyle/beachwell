@@ -37,19 +37,19 @@ Mean absolute error of hour predictions, weeks 1 to 8 versus weeks 9 to 17.
 | Measure | Default schedule | With BeachWell plan |
 | --- | --- | --- |
 | Peak week (hours of work) | 36.0 | 27.4 |
-| Overload weeks per student | 2.6 | 0.95 |
+| Overload weeks per student | 2.65 | 1.05 |
 
 Rule violations across all plans: **0**. Share of estimated hours placed in study blocks: **100%** (the rest did not fit before its due time).
 
-## E. Event recommendations (24 labeled sample students, all 20 catalog programs)
+## E. Event recommendations (24 labeled sample students, the 20 programs they chose from)
 
 Found@3 = good picks in the top 3 out of the most that were possible (a student with one good option counts as 1/1). MRR = 1 / position of the first good pick. Learned profiles are tested leave-one-out.
 
 | Method | Precision@3 | Found@3 | Hit@1 | MRR |
 | --- | --- | --- | --- | --- |
-| Random order (baseline, average of 200 shuffles) | 0.12 | 0.149 | 0.118 | 0.3 |
-| Most frequent programs (popularity baseline) | 0.069 | 0.076 | 0.125 | 0.268 |
-| Keyword overlap (baseline) | 0.389 | 0.514 | 0.583 | 0.725 |
+| Random order (baseline, average of 200 shuffles) | 0.119 | 0.148 | 0.116 | 0.299 |
+| Most frequent programs (popularity baseline) | 0.111 | 0.132 | 0.042 | 0.253 |
+| Keyword overlap (baseline) | 0.375 | 0.493 | 0.625 | 0.738 |
 | BeachWell v1 (Phase 1 scoring) | 0.444 | 0.611 | 0.708 | 0.824 |
 | BeachWell v2 without learned profiles | 0.5 | 0.681 | 0.875 | 0.927 |
 | BeachWell v2 with learned profiles (leave-one-out) | 0.542 | 0.736 | 0.875 | 0.927 |

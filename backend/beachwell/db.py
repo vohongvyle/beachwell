@@ -72,7 +72,8 @@ CREATE TABLE IF NOT EXISTS events (
     location TEXT NOT NULL DEFAULT '',
     series TEXT NOT NULL DEFAULT '',
     source_url TEXT NOT NULL DEFAULT '',
-    is_sample INTEGER NOT NULL DEFAULT 1
+    is_sample INTEGER NOT NULL DEFAULT 1,
+    checked_on TEXT NOT NULL DEFAULT ''   -- date the team confirmed this program on an official page
 );
 CREATE INDEX IF NOT EXISTS idx_events_start ON events(start);
 """

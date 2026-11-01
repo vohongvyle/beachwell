@@ -243,12 +243,16 @@ def eval_events() -> dict:
     profiles learned from their own labels.
     """
     personas = json.load(open(HERE / "data" / "event_personas.json", encoding="utf-8"))
+    # Only the programs the labelers could choose from (labeling/event_choices.csv); programs added
+    # to the catalog later have no labels, so including them would count good new picks as misses.
+    with open(HERE.parent / "labeling" / "event_choices.csv", encoding="utf-8") as f:
+        labeled = {r["series_id"] for r in csv.DictReader(f)}
     pool, seen = [], set()
     for e in sorted(seed.build_events(), key=lambda e: e["start"]):
-        if e["series"] not in seen:
+        if e["series"] in labeled and e["series"] not in seen:
             seen.add(e["series"])
             pool.append(e)
-    freq = Counter(e["series"] for e in seed.build_events())
+    freq = Counter(e["series"] for e in seed.build_events() if e["series"] in labeled)
     rng = random.Random(RNG_SEED)
 
     def keyword(i, interests):
@@ -385,7 +389,7 @@ def main() -> None:
                    pl["overload_weeks_per_student"]["with_plan"]]]),
           f"\nRule violations across all plans: **{pl['rule_violations']}**. Share of estimated hours placed in "
           f"study blocks: **{round(pl['share_of_hours_scheduled'] * 100)}%** (the rest did not fit before its due time).\n",
-          f"## E. Event recommendations ({ev['personas']} labeled sample students, all {ev['pool']} catalog programs)\n\n"
+          f"## E. Event recommendations ({ev['personas']} labeled sample students, the {ev['pool']} programs they chose from)\n\n"
           "Found@3 = good picks in the top 3 out of the most that were possible (a student with one good option counts as 1/1). "
           "MRR = 1 / position of the first good pick. Learned profiles are tested leave-one-out.\n",
           _table(["Method", "Precision@3", "Found@3", "Hit@1", "MRR"],

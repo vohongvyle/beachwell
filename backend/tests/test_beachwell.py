@@ -2,6 +2,7 @@
 
 They run fully offline (no Gemini key needed) against a temporary database.
 """
+import csv
 import os
 import tempfile
 import unittest
@@ -18,6 +19,7 @@ from beachwell import ical, llm, seed, semester, service  # noqa: E402
 from beachwell.agents import deadline, events, forecast, pace, planner, radar, safety  # noqa: E402
 
 TODAY = date(2026, 10, 12)
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def task(i, title, due, hours, kind="homework", major=False, done=False):
@@ -272,10 +274,26 @@ class TestDataFiles(unittest.TestCase):
 
     def test_event_catalog_csv(self):
         rows = seed.load_catalog()
-        self.assertEqual(len(rows), 20)
-        self.assertEqual(len({r[0] for r in rows}), 20)  # unique ids
+        self.assertGreaterEqual(len(rows), 20)
+        self.assertEqual(len({r[0] for r in rows}), len(rows))  # unique ids
+        labeled = {r["series_id"] for r in csv.DictReader(open(ROOT / "labeling" / "event_choices.csv", encoding="utf-8"))}
+        self.assertTrue(labeled <= {r[0] for r in rows})  # every program the labels refer to still exists
         for r in rows:
             self.assertLess(r[7], r[8], r[0])  # start before end
+
+    def test_event_sheet_import_cleans_cells(self):
+        import importlib.util
+        from datetime import time as dtime
+        spec = importlib.util.spec_from_file_location("imp", ROOT / "scripts" / "import_event_sheet.py")
+        imp = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(imp)
+        self.assertEqual(imp.norm_days("Mon;Tue;Wed;Thu:Fri"), "Mon;Tue;Wed;Thu;Fri")
+        self.assertEqual(imp.norm_time(dtime(7, 5)), "07:05")
+        self.assertEqual(imp.norm_weeks(8), "8")
+        self.assertEqual(imp.norm_weeks("regular"), "regular")
+        self.assertEqual(imp.tags_from("music; crowd"), "music;large-crowd")
+        with self.assertRaises(ValueError):
+            imp.norm_days("Someday")
 
     def test_eval_sets_sizes(self):
         import csv, json

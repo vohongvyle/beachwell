@@ -276,6 +276,7 @@ def recommend(interests: str, weeks: list[dict], events: list[dict], classes: li
 def _public(ev: dict) -> dict:
     return {k: ev[k] for k in ("id", "title", "organizer", "description", "location", "start", "end", "source_url")} | {
         "tags": ev["tags"].split(","), "expected": bool(ev.get("expected")), "is_sample": bool(ev.get("is_sample", 1)),
+        "checked_on": ev.get("checked_on", "") or "",
         "when": slot_text(ev)}
 
 

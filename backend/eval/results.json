@@ -72,8 +72,8 @@
       "with_plan": 27.4
     },
     "overload_weeks_per_student": {
-      "default_schedule": 2.6,
-      "with_plan": 0.95
+      "default_schedule": 2.65,
+      "with_plan": 1.05
     }
   },
   "events": {
@@ -81,22 +81,22 @@
     "pool": 20,
     "methods": {
       "Random order (baseline, average of 200 shuffles)": {
-        "precision_at_3": 0.12,
-        "found_at_3": 0.149,
-        "hit_at_1": 0.118,
-        "mrr": 0.3
+        "precision_at_3": 0.119,
+        "found_at_3": 0.148,
+        "hit_at_1": 0.116,
+        "mrr": 0.299
       },
       "Most frequent programs (popularity baseline)": {
-        "precision_at_3": 0.069,
-        "found_at_3": 0.076,
-        "hit_at_1": 0.125,
-        "mrr": 0.268
+        "precision_at_3": 0.111,
+        "found_at_3": 0.132,
+        "hit_at_1": 0.042,
+        "mrr": 0.253
       },
       "Keyword overlap (baseline)": {
-        "precision_at_3": 0.389,
-        "found_at_3": 0.514,
-        "hit_at_1": 0.583,
-        "mrr": 0.725
+        "precision_at_3": 0.375,
+        "found_at_3": 0.493,
+        "hit_at_1": 0.625,
+        "mrr": 0.738
       },
       "BeachWell v1 (Phase 1 scoring)": {
         "precision_at_3": 0.444,

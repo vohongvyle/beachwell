@@ -359,7 +359,7 @@ async function renderRecharge() {
   view.innerHTML = `
     <h2>Recharge on campus</h2>
     <p class="quiet">Picked for your heaviest weeks, matched to what you said helps you recharge, and placed in time you actually have free.</p>
-    <p class="small"><span class="tag sample">Sample event data</span> Organizers and places are real CSULB programs; dates and times are placeholders for this prototype.</p>
+    <p class="small"><span class="tag ok">Checked</span> Days and times confirmed by our team on the program's official page (date shown). <span class="tag sample">Not confirmed</span> A real CSULB program, but the time is our best guess; check the program's page before you go.</p>
     ${r.weeks.map((w) => `
       <div class="weekhead"><h2>Week ${w.week}, ${esc(w.label)}</h2>${badge(w.level)}</div>
       ${w.picks.length ? `<div class="picks">${w.picks.map((p) => `
@@ -368,6 +368,7 @@ async function renderRecharge() {
           <p class="when" style="margin:0">${esc(p.when)}</p>
           <p class="where" style="margin:0 0 6px">${esc(p.location)}, ${esc(p.organizer)}</p>
           ${p.expected ? `<span class="tag warn">Expected, not posted yet</span>` : ""}
+          ${p.checked_on && !p.expected ? `<span class="tag ok">Checked ${new Date(p.checked_on + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>` : !p.expected ? `<span class="tag sample">Not confirmed</span>` : ""}
           <p class="why">${esc(p.reason)}</p>
           ${p.source_url ? `<a class="small" href="${esc(p.source_url)}" target="_blank" rel="noopener">About this program</a>` : ""}
         </article>`).join("")}</div>` : `<p>No events fit your free time this week. A 15-minute walk counts too.</p>`}`).join("")}`;

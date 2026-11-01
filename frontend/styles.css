@@ -124,6 +124,7 @@ main:focus { outline: none; }
 .list li:first-child { border-top: 0; }
 .tag { display: inline-block; font-size: .78rem; padding: 2px 8px; border-radius: 999px; background: var(--glass); color: var(--ink); }
 .tag.warn { background: #F9E2B8; }
+.tag.ok { background: #DDF0E6; color: #1F5B40; font-weight: 700; }
 .tag.sample { background: var(--fog); color: var(--ink-soft); border: 1px dashed var(--line); }
 
 /* what-if */

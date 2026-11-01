@@ -173,7 +173,9 @@ def load_catalog(path=None) -> list[tuple]:
 
     Columns: series_id, title, organizer, description, tags (;-separated), location,
     days (Mon;Wed), start and end (HH:MM, 24-hour), weeks ("regular" or 8;9;16),
-    source_url, is_real_program. Edit the CSV, then run scripts/seed.py --reset.
+    source_url, is_real_program, dates_checked (the day the team confirmed the days and times on
+    an official page; blank = not confirmed). Edit the CSV, or fill in the team spreadsheet and run
+    scripts/import_event_sheet.py, then run scripts/seed.py --reset.
     """
     rows = []
     with open(path or EVENTS_CSV, newline="", encoding="utf-8") as f:
@@ -186,7 +188,7 @@ def load_catalog(path=None) -> list[tuple]:
                          [_DAYS.index(d.strip()[:3].title()) for d in r["days"].split(";") if d.strip()],
                          _hours(r["start"]), _hours(r["end"]),
                          "regular" if weeks == "regular" else [int(w) for w in weeks.split(";") if w.strip()],
-                         r.get("source_url", "").strip()))
+                         r.get("source_url", "").strip(), (r.get("dates_checked") or "").strip()))
     return rows
 
 
@@ -199,16 +201,19 @@ def build_events() -> list[dict]:
     terms = {**{k: v - timedelta(days=v.weekday()) for k, v in PAST_TERMS.items()}, "Fall 2026": cur_start}
     out = []
     for term, start in terms.items():
-        for series, title, org, desc, tags, loc, days, h0, h1, weeks, src in load_catalog():
+        for series, title, org, desc, tags, loc, days, h0, h1, weeks, src, checked in load_catalog():
             for wk in (REGULAR_WEEKS if weeks == "regular" else weeks):
-                if term == "Fall 2026" and wk > POSTED_THROUGH_WEEK:
-                    continue
+                if term == "Fall 2026" and wk > POSTED_THROUGH_WEEK and not checked:
+                    continue  # unconfirmed later sessions are shown as "expected" from past terms instead
                 for wd in days:
                     d = start + timedelta(days=7 * (wk - 1) + wd)
                     out.append({
                         "id": f"{series}-{d.isoformat()}", "title": title, "organizer": org, "description": desc,
                         "tags": tags, "start": ical.local_dt(d, h0).isoformat(), "end": ical.local_dt(d, h1).isoformat(),
-                        "location": loc, "series": series, "source_url": src, "is_sample": 1,
+                        "location": loc, "series": series, "source_url": src,
+                        # confirmed programs are real for this term only; past-term copies stay simulated
+                        "is_sample": 0 if (checked and term == "Fall 2026") else 1,
+                        "checked_on": checked if term == "Fall 2026" else "",
                     })
     return out
 
@@ -241,8 +246,8 @@ def seed(reset: bool = False, cohort_size: int = 420, seed_value: int = 7, use_l
             return {"skipped": True}
         evs = build_events()
         c.executemany("INSERT OR REPLACE INTO events (id, title, organizer, description, tags, start, end, location, "
-                      "series, source_url, is_sample) VALUES (:id, :title, :organizer, :description, :tags, :start, "
-                      ":end, :location, :series, :source_url, :is_sample)", evs)
+                      "series, source_url, is_sample, checked_on) VALUES (:id, :title, :organizer, :description, :tags, :start, "
+                      ":end, :location, :series, :source_url, :is_sample, :checked_on)", evs)
 
         # ---- synthetic cohort (for the Campus Radar)
         estimates: dict[tuple[str, str], deadline.Estimate] = {}
