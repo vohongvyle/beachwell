@@ -174,7 +174,7 @@ def load_catalog(path=None) -> list[tuple]:
     Columns: series_id, title, organizer, description, tags (;-separated), location,
     days (Mon;Wed), start and end (HH:MM, 24-hour), weeks ("regular" or 8;9;16),
     source_url, is_real_program, dates_checked (the day the team confirmed the days and times on
-    an official page; blank = not confirmed). Edit the CSV, or fill in the team spreadsheet and run
+    an official page; blank = not confirmed), running_this_term (no = not offered this term). Edit the CSV, or fill in the team spreadsheet and run
     scripts/import_event_sheet.py, then run scripts/seed.py --reset.
     """
     rows = []
@@ -188,7 +188,8 @@ def load_catalog(path=None) -> list[tuple]:
                          [_DAYS.index(d.strip()[:3].title()) for d in r["days"].split(";") if d.strip()],
                          _hours(r["start"]), _hours(r["end"]),
                          "regular" if weeks == "regular" else [int(w) for w in weeks.split(";") if w.strip()],
-                         r.get("source_url", "").strip(), (r.get("dates_checked") or "").strip()))
+                         r.get("source_url", "").strip(), (r.get("dates_checked") or "").strip(),
+                         (r.get("running_this_term") or "yes").strip().lower() != "no"))
     return rows
 
 
@@ -201,7 +202,9 @@ def build_events() -> list[dict]:
     terms = {**{k: v - timedelta(days=v.weekday()) for k, v in PAST_TERMS.items()}, "Fall 2026": cur_start}
     out = []
     for term, start in terms.items():
-        for series, title, org, desc, tags, loc, days, h0, h1, weeks, src, checked in load_catalog():
+        for series, title, org, desc, tags, loc, days, h0, h1, weeks, src, checked, running in load_catalog():
+            if term == "Fall 2026" and not running:
+                continue  # marked "Not running" or "Removed" in the team sheet
             for wk in (REGULAR_WEEKS if weeks == "regular" else weeks):
                 if term == "Fall 2026" and wk > POSTED_THROUGH_WEEK and not checked:
                     continue  # unconfirmed later sessions are shown as "expected" from past terms instead

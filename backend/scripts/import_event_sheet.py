@@ -7,7 +7,10 @@ The spreadsheet (docs/BeachWell_Event_Updates.xlsx) has two tabs the team fills 
 For every row, the yellow "new" columns win over the old values. A row counts as
 checked on an official page when "Source URL used" is a real link (not "Sample");
 its date goes into the dates_checked column, and the app shows it as confirmed.
-Rows without a link keep their times but stay marked as unconfirmed.
+Rows without a link keep their times but stay marked as unconfirmed. A Status of
+"Removed" or "Not running" keeps the row (past terms and the evaluation still use it)
+but the app stops suggesting it this term. Days and times can stay as they are.
+Self-guided programs that are open any time can use 00:00 to 23:59.
 
 Descriptions and tags already in events_catalog.csv are kept; new programs get the
 sheet's suggested tags and description until someone writes better ones in the CSV.
@@ -30,7 +33,8 @@ from openpyxl import load_workbook
 ROOT = Path(__file__).resolve().parent.parent
 CSV_PATH = ROOT / "data" / "events_catalog.csv"
 FIELDS = ["series_id", "title", "organizer", "description", "tags", "location", "days", "start", "end",
-          "weeks", "source_url", "is_real_program", "dates_checked"]
+          "weeks", "source_url", "is_real_program", "dates_checked", "running_this_term"]
+STOPPED = {"removed", "not running"}  # Status values that mean "not running this term"
 DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 
@@ -96,7 +100,7 @@ def main(sheet_path: str) -> None:
     out, problems, notes = [], [], []
 
     def build(sid, title, org, days, start, end, weeks, loc, src_used, fallback_src, checked, real,
-              desc_default, tags_default, label):
+              desc_default, tags_default, label, status=""):
         try:
             row = {"series_id": sid, "title": title, "organizer": org,
                    "days": norm_days(days), "start": norm_time(start), "end": norm_time(end),
@@ -116,6 +120,7 @@ def main(sheet_path: str) -> None:
             "source_url": link or prev.get("source_url") or fallback_src,
             "is_real_program": real,
             "dates_checked": checked if link else "",
+            "running_this_term": "no" if str(status or "").strip().lower() in STOPPED else "yes",
         })
         out.append(row)
 
@@ -126,14 +131,11 @@ def main(sheet_path: str) -> None:
               r["New days"] or r["Days now"], r["New start"] or r["Start now"], r["New end"] or r["End now"],
               r["New weeks"] if r["New weeks"] not in (None, "") else r["Weeks now"],
               r["New location"], r["Source URL used"], url_in(r["Where to check"]), checked_date(r["Date checked"]),
-              "yes" if str(r["Real program?"]).strip().lower() == "yes" else "no", "", "", "existing")
+              "yes" if str(r["Real program?"]).strip().lower() == "yes" else "no", "", "", "existing", r.get("Status"))
     new_tab = next((ws for ws in wb if ws.title.startswith("New programs")), None)
     if new_tab is not None:
         for r in rows_of(new_tab, "Suggested ID"):
             sid = str(r["Suggested ID"]).strip()
-            if str(r.get("Status") or "").strip().lower() == "not running":
-                notes.append(f"skipped {sid}: marked Not running")
-                continue
             if str(r.get("Fits BeachWell?") or "").strip().lower() == "no":
                 notes.append(f"skipped {sid}: marked as not a fit")
                 continue
@@ -142,7 +144,7 @@ def main(sheet_path: str) -> None:
                 continue
             build(sid, r["Program"], r["Organizer"], r["Days"], r["Start"], r["End"], r["Weeks"], r["Location"],
                   r["Source URL used"], url_in(r["Source page"]), checked_date(r["Date checked"]), "yes",
-                  str(r["What the page says"] or "").strip(), tags_from(r["Suggested tags"]), "new")
+                  str(r["What the page says"] or "").strip(), tags_from(r["Suggested tags"]), "new", r.get("Status"))
 
     if problems:
         print("Fix these cells in the sheet, then run again. Nothing was written:")
@@ -158,6 +160,9 @@ def main(sheet_path: str) -> None:
         w.writeheader()
         w.writerows(out)
     checked = sum(bool(r["dates_checked"]) for r in out)
+    stopped = [r["series_id"] for r in out if r["running_this_term"] == "no"]
+    if stopped:
+        notes.append(f"not running this term (kept for past terms and the evaluation): {', '.join(stopped)}")
     print(f"Wrote {len(out)} programs to {CSV_PATH.relative_to(ROOT)}: {checked} with dates checked on an official page, "
           f"{len(out) - checked} still unconfirmed.")
     for n in notes:

@@ -294,6 +294,10 @@ class TestDataFiles(unittest.TestCase):
         self.assertEqual(imp.tags_from("music; crowd"), "music;large-crowd")
         with self.assertRaises(ValueError):
             imp.norm_days("Someday")
+        ev = {"start": at(TODAY, 0).isoformat(), "end": at(TODAY, 23 + 59 / 60).isoformat()}
+        self.assertTrue(events.is_any_time(ev))
+        self.assertTrue(events.slot_text(ev).endswith("any time"))
+        self.assertTrue(all(len(r) == 13 for r in seed.load_catalog()))  # includes running_this_term
 
     def test_eval_sets_sizes(self):
         import csv, json

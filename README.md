@@ -12,7 +12,7 @@ The list below is what is left, in order of due date. Owners are a proposal; cha
 
 ### By Fri Oct 23: data
 - [x] **Real event dates** (Deborah, Oct 29–31): the tracker `docs/BeachWell_Event_Updates.xlsx` is filled in and imported. The catalog now has **50 programs; 22 have days and times confirmed on an official page**, and the app labels each pick "Checked" or "Not confirmed".
-- [ ] **Confirm the rest** (Deborah): 28 programs still say "Sample" in the tracker's "Source URL used" column (the 7 invented clubs, plus real programs whose page has no current dates). Paste a link for each one you confirm, mark programs that are not running this term as "Not running", then run `python scripts/import_event_sheet.py` and `python scripts/seed.py --reset`. Also check two cells we changed during import: Free Bowling (the sheet said 07:00–21:00; we used 7–9 pm) and the Art Park tour (shown as 9 am–5 pm).
+- [ ] **Confirm the rest** (Deborah): fill in the short checklist `docs/BeachWell_Events_To_Check.xlsx` (22 real programs: Still running? Yes/No, the link you checked, and corrected days/time/weeks only if different). Then Vy runs `python scripts/apply_event_checks.py ../docs/BeachWell_Events_To_Check.xlsx` and `python scripts/seed.py --reset`; this updates the big tracker and the catalog. The 6 invented clubs need nothing.
 - [x] **Deborah's labels** (done Oct 27): `effort_labels_deborah.csv`, `persona_labels_deborah.csv`, and 30 safety messages in `safety_messages_team.csv`. They are already used: see "Learning from the team's labels" below.
 - [ ] **Vy's labels** (Vy): fill in `effort_labels_vy.csv` and `persona_labels_vy.csv` without looking at Deborah's (about 2 hours). Then we get agreement (Cohen's kappa) and averaged labels.
 - [ ] **Vy's unseen safety set** (Vy): 15 everyday-stress and 15 help-needed messages in `backend/labeling/safety_messages_unseen.csv`, written without looking at `agents/safety.py` or Deborah's set. Deborah's set was used to fix the rules, so this is now the honest test.
@@ -176,6 +176,7 @@ backend/
     merge_labels.py             combine Vy's and Deborah's labels, measure agreement
     learn_from_labels.py        learn event profiles and effort calibration from the labels
     import_event_sheet.py       turn the team's event spreadsheet into data/events_catalog.csv
+    apply_event_checks.py       apply the short "To check" sheet to the tracker, then rebuild the catalog
     score_sus.py                score the classmate survey
   labeling/           blank labeling sheets for each team member, plus a how-to
   tests/              unit and integration tests (python -m unittest)

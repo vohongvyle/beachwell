@@ -107,8 +107,16 @@ def _fmt_time(dt: datetime) -> str:
     return f"{h}:{dt.minute:02d} {'am' if dt.hour < 12 else 'pm'}" if dt.minute else f"{h} {'am' if dt.hour < 12 else 'pm'}"
 
 
+def is_any_time(ev: dict) -> bool:
+    """Self-guided programs entered as 00:00-23:59 (open whenever you like)."""
+    s, e = datetime.fromisoformat(ev["start"]), datetime.fromisoformat(ev["end"])
+    return s.hour == 0 and s.minute == 0 and (e.hour, e.minute) >= (23, 59)
+
+
 def slot_text(ev: dict) -> str:
     s, e = datetime.fromisoformat(ev["start"]), datetime.fromisoformat(ev["end"])
+    if is_any_time(ev):
+        return f"{s.strftime('%a %b')} {s.day}, any time"
     return f"{s.strftime('%a %b')} {s.day}, {_fmt_time(s)}–{_fmt_time(e)}"
 
 
