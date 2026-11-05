@@ -8,7 +8,7 @@ For our CECS 458/558 project, we wanted to work on something we could actually s
 
 That's why we made BeachWell. Students can bring in their Canvas deadlines, see which weeks might get busy, and get a study plan that spreads the work out. We also added short daily check-ins and campus event suggestions, because managing a busy semester isn't only about finishing assignments.
 
-It's still a class project, so we're testing what works and what needs improvement.
+It's still a project in progress, so we're testing what works and what needs improvement.
 
 ![BeachWell workload dashboard](docs/screenshots/2-workload.png)
 
