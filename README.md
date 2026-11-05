@@ -4,7 +4,7 @@
 
 CECS 458/558 term project, Fall 2026. Team: Vo Hong Vy Le and Deborah Shaw.
 
-## What to do next (updated Oct 29, 2026)
+### What to do next (updated Oct 29, 2026)
 
 Phase 1 is done: the working prototype (all 7 parts), first evaluation results and the Phase 1 report. Since then (Oct 2026): Deborah's labels are in and the app learns from them, the event recommender and hour estimates improved, the safety rules were fixed after a fresh test exposed misses, the event catalog now holds 50 real campus programs (22 with confirmed times), and there are 36 tests. A short portfolio summary with screenshots is in `docs/reports/BeachWell_Portfolio_Summary.pdf`.
 
@@ -46,7 +46,7 @@ Both of us should be able to explain the whole system, since questions can go to
 
 ![Workload screen](docs/screenshots/2-workload.png)
 
-## What it does
+### What it does
 
 | Screen | What the student sees | AI behind it |
 | --- | --- | --- |
@@ -98,7 +98,7 @@ python -m unittest -v           # 36 tests, offline
 python eval/evaluate.py         # writes eval/results.md and eval/results.json
 ```
 
-## Evaluation (offline mode, from `backend/eval/results.md`)
+### Evaluation (offline mode, from `backend/eval/results.md`)
 
 | Component | Baseline | BeachWell |
 | --- | --- | --- |
@@ -121,14 +121,14 @@ Three of the six tests use synthetic data, and the labels so far come from one p
 
 Every number above that uses something learned is leave-one-out: a sample student or assignment is never scored with what was learned from it.
 
-## Screenshots
+### Screenshots
 
 | | |
 | --- | --- |
 | ![What-if slider](docs/screenshots/3-what-if.png) | ![Study plan](docs/screenshots/4-plan.png) |
 | ![Recharge picks](docs/screenshots/5-recharge.png) | ![Campus Radar](docs/screenshots/7-radar.png) |
 
-## Architecture
+### Architecture
 
 ```mermaid
 flowchart LR
@@ -146,80 +146,6 @@ flowchart LR
 * **Backend:** Python, [Starlette](https://www.starlette.io) (the framework FastAPI is built on) served by Uvicorn, SQLite from the standard library. Each agent is a plain module in `backend/beachwell/agents/` with its own tests.
 * **AI:** Google Gemini over its REST API (`beachwell/llm.py`), with deterministic offline fallbacks. How each prompt is used, and what the team built beyond the API, is documented in [docs/AI_WORKFLOW.md](docs/AI_WORKFLOW.md).
 * **Frontend:** one static page in `frontend/` (HTML, CSS and JavaScript modules, no build step), served by the backend.
-
-## Project layout
-
-```
-backend/
-  beachwell/
-    app.py            HTTP API and static file serving
-    service.py        glue between storage and agents
-    config.py         settings from environment variables / .env
-    db.py             SQLite schema (feed links never stored; check-in notes discarded)
-    ical.py           read Canvas .ics feeds, write .ics study plans
-    llm.py            Gemini REST client, call log, offline fallbacks
-    semester.py       week-of-term helpers
-    seed.py           loads the event catalog; builds the synthetic cohort and demo student
-    agents/
-      deadline.py     Deadline Agent: type and hour estimates
-      pace.py         personal pace model (empirical Bayes)
-      forecast.py     Workload Agent: weekly load index and reasons
-      planner.py      Planner Agent: scheduler, rule checker, habits
-      events.py       Event Recommender: retrieval, time fit, re-ranking
-      safety.py       Safety Agent: rules + Gemini, fixed crisis response
-      radar.py        Campus Radar: anonymous heatmap, alerts, collisions
-  data/               events_catalog.csv (editable), sample Canvas feeds (.ics),
-                      event_profiles.json and effort_calibration.json (learned from labels)
-  scripts/
-    seed.py                     create the database
-    make_practice_semesters.py  regenerate the 40 practice semesters
-    merge_labels.py             combine Vy's and Deborah's labels, measure agreement
-    learn_from_labels.py        learn event profiles and effort calibration from the labels
-    import_event_sheet.py       turn the team's event spreadsheet into data/events_catalog.csv
-    apply_event_checks.py       apply the short "To check" sheet to the tracker, then rebuild the catalog
-    score_sus.py                score the classmate survey
-  labeling/           blank labeling sheets for each team member, plus a how-to
-  tests/              unit and integration tests (python -m unittest)
-  eval/               evaluation data, script and results
-usability/            classmate test script, survey questions, response sheet
-frontend/             index.html, styles.css, app.js
-docs/AI_WORKFLOW.md   prompts, inputs/outputs, limitations, team contribution
-```
-
-## Main API endpoints
-
-| Method | Path | Purpose |
-| --- | --- | --- |
-| POST | `/api/users` | Create a student |
-| POST | `/api/users/{id}/calendar` | Import a Canvas feed (`{url}` or `{ics}`) |
-| PUT | `/api/users/{id}/classes` | Set weekly class times |
-| GET, POST | `/api/users/{id}/forecast` | Workload scores; POST for what-if (`extra_lead`, `use_plan`) |
-| GET | `/api/users/{id}/plan`, `/plan.ics` | Study plan, and as a calendar file |
-| GET | `/api/users/{id}/events` | De-stress picks for heavy weeks |
-| POST | `/api/users/{id}/checkins` | Check-in with safety screening |
-| GET | `/api/users/{id}/pace` | Personal pace model |
-| PATCH | `/api/users/{id}/tasks/{task_id}` | Log actual hours, fix an estimate, mark done |
-| GET | `/api/radar` | Campus Stress Radar |
-| GET | `/api/llm-log` | Recent Gemini calls (name, latency, success) |
-
-## Data
-
-The project needs no real student data. Every file below is either generated by our code, copied from public CSULB pages, or written by the team.
-
-| File | What it is | Where it comes from |
-| --- | --- | --- |
-| `backend/data/events_catalog.csv` | 50 campus programs (title, place, days, times, tags, source link, date confirmed) | Imported from `docs/BeachWell_Event_Updates.xlsx` with `python scripts/import_event_sheet.py`; 22 confirmed on official ASI, Recreation, CSULB and Carpenter Center pages. Clubs marked "sample" are invented. Then run `python scripts/seed.py --reset` |
-| `backend/data/sample_canvas_feed.ics` | A Canvas-style calendar feed for 5 courses (89 deadlines) | Generated; upload it on the welcome screen to test the import |
-| `backend/data/sample_canvas_feed_business.ics` | A second feed with 4 business and GE courses | Generated |
-| `backend/eval/data/practice_semesters.json` (+ `_deadlines.csv`) | 40 practice semesters, each with one known crunch week and one decoy week | Generated by `scripts/make_practice_semesters.py` |
-| `backend/eval/data/effort_labels.csv` | 60 assignment titles with type and hours | Written by `merge_labels.py` from the team's sheets (Deborah's only, until Vy's are done); the prototype's draft labels are kept in `eval/data/draft/` |
-| `backend/eval/data/event_personas.json` | 24 sample students and their best-fitting events | Same as above |
-| `backend/data/event_profiles.json`, `backend/data/effort_calibration.json` | What the app learned from the labels | `scripts/learn_from_labels.py` |
-| `backend/labeling/safety_messages_team.csv` | Deborah's 15 everyday-stress and 15 help-needed messages | Team; used to improve the safety rules (development set) |
-| `backend/labeling/safety_messages_unseen.csv` | Vy's 30 messages, the honest safety test | Team; to be written without looking at the rules |
-| `backend/eval/data/safety_messages.csv` | 30 everyday-stress and 30 help-needed messages | Written for the prototype |
-| `backend/labeling/` | Blank sheets for Vy and Deborah, the event list, and a fresh safety set to write | Team (see `labeling/README.md`, about 2 hours each) |
-| `usability/` | Test script, SUS survey and response sheet for 8–10 classmates | Team (see `usability/test_script.md`) |
 
 ### Team workflow for the data (in order)
 
