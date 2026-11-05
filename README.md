@@ -2,13 +2,14 @@
 
 **A workload planner for CSULB students.**
 
-*CECS 458/558 · Fall 2026 · Team project by Vo Hong Vy Le and Deborah Shaw*
+**Helping CSULB students plan around busy weeks, not just react to them.**
 
-For our CECS 458/558 project, we wanted to work on something we could actually see students using. We've both had weeks when several assignments were due around the same time, and just seeing everything on a calendar didn't really help us figure out where to start.
+BeachWell is our Fall 2026 CECS 458/558 team project. We wanted to build something that could look at a student's upcoming Canvas deadlines, estimate how demanding each week might be, and help them make a more manageable plan. Instead of only showing a calendar, BeachWell gives a weekly workload score, suggests when to start assignments, and recommends campus activities that fit around classes and studying.
 
-That's why we made BeachWell. Students can bring in their Canvas deadlines, see which weeks might get busy, and get a study plan that spreads the work out. We also added short daily check-ins and campus event suggestions, because managing a busy semester isn't only about finishing assignments.
+We also built a **Campus Stress Radar** to explore how aggregated, anonymous workload trends might help campus staff spot especially busy weeks. BeachWell is a planning prototype, not a medical or mental-health diagnostic tool.
 
-It's still a project in progress, so we're testing what works and what needs improvement.
+**Team:** Vo Hong Vy Le and Deborah Shaw  
+**Course:** CECS 458/558 · Fall 2026
 
 ![BeachWell workload dashboard](docs/screenshots/2-workload.png)
 
@@ -156,7 +157,7 @@ The semester dates still need to be configured for a real term. SQLite is approp
 | Team member | Main contributions |
 | --- | --- |
 | **Vo Hong Vy Le** | Backend development, AI agents, and evaluation |
-| **Deborah Shaw** | Frontend development, market research, campus event catalog, and reports |
+| **Deborah Shaw** | Frontend development, market data research, campus event catalog |
 | **Both** | Independent labeling and project testing |
 
 We divided up the main development work, then brought everything together into the same app.
