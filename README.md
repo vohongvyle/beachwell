@@ -129,49 +129,6 @@ python scripts/import_event_sheet.py ../docs/BeachWell_Event_Updates.xlsx
 python scripts/seed.py --reset
 ```
 
-## Project structure
-
-```text
-backend/
-  beachwell/
-    agents/             deadline, pace, forecast, planner,
-                        events, safety, and radar logic
-    app.py              API and frontend serving
-    service.py          connects storage and agents
-    db.py               SQLite storage
-    ical.py             Canvas import and calendar export
-    llm.py              Gemini client and offline fallback
-  data/                 event catalog, locations, sample feeds,
-                        and learned calibration files
-  labeling/             team labeling sheets and safety examples
-  scripts/              data import, seeding, learning, evaluation helpers
-  eval/                 evaluation datasets and results
-  tests/                unit and integration tests
-frontend/               HTML, CSS, and JavaScript app
-docs/                   screenshots, reports, event tracker,
-                        and AI workflow notes
-usability/              classmate testing materials
-```
-
-### Main API routes
-
-| Endpoint | Purpose |
-| --- | --- |
-| `POST /api/users` | Create a student |
-| `POST /api/users/{id}/calendar` | Import Canvas deadlines |
-| `PUT /api/users/{id}/classes` | Set class times |
-| `GET /api/users/{id}/forecast` | View workload scores |
-| `POST /api/users/{id}/forecast` | Try a what-if scenario |
-| `GET /api/users/{id}/plan` | View the study plan |
-| `GET /api/users/{id}/plan.ics` | Export the plan |
-| `GET /api/users/{id}/events` | Get campus activity suggestions |
-| `POST /api/users/{id}/checkins` | Save a screened check-in |
-| `GET /api/users/{id}/pace` | View personal pace adjustments |
-| `PATCH /api/users/{id}/tasks/{task_id}` | Update task progress or actual hours |
-| `GET /api/radar` | View aggregated workload patterns |
-| `GET /api/llm-log` | Review recent Gemini calls |
-| `DELETE /api/users/{id}` | Delete a student's data |
-
 ## Privacy and responsible AI
 
 We built the demo around **sample and synthetic student data**, rather than collecting real student records for our tests. Canvas feed links are not saved, and free-text check-in notes are screened and then discarded. Students can request deletion of their stored data.
@@ -182,11 +139,11 @@ The Campus Radar only uses opt-in data and suppresses groups smaller than **10**
 
 This is a course prototype, and there are a few important things we haven't finished:
 
-- Collect Vy's independent effort and event labels, measure agreement, and rerun evaluation.
+- Collect event labels, measure agreement, and rerun evaluation.
 - Test safety screening on a new unseen set instead of the examples used to improve the rules.
 - Run and review real Gemini evaluations, including latency and estimation mistakes.
 - Check the Canvas import with a real feed locally and polish the mobile interface.
-- Run a usability study with 8–10 classmates and review the cases where the app performs poorly.
+- Run a usability study with classmates and review the cases where the app performs poorly.
 
 The semester dates still need to be configured for a real term. SQLite is appropriate for our prototype; a production campus system would need stronger deployment infrastructure and CSULB sign-in. Recurring-event projections are also estimates, not confirmed future schedules.
 
@@ -195,9 +152,7 @@ The semester dates still need to be configured for a real term. SQLite is approp
 | Team member | Main contributions |
 | --- | --- |
 | **Vo Hong Vy Le** | Backend development, AI agents, and evaluation |
-| **Deborah Shaw** | Frontend development, market research, campus event catalog, and reports |
+| **Deborah Shaw** | Frontend development, market data research, campus event catalog, and reports |
 | **Both** | Independent labeling and project testing |
-
-We worked on different parts of BeachWell, but designed the features to work together as one student-facing tool.
 
 **License:** MIT
