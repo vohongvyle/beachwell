@@ -15,7 +15,7 @@ os.environ["BEACHWELL_OFFLINE"] = "1"
 os.environ["DEMO_TODAY"] = "2026-10-12"
 os.environ["SEMESTER_START"] = "2026-08-24"
 
-from beachwell import ical, llm, seed, semester, service  # noqa: E402
+from beachwell import campus, ical, llm, seed, semester, service  # noqa: E402
 from beachwell.agents import deadline, events, forecast, pace, planner, radar, safety  # noqa: E402
 
 TODAY = date(2026, 10, 12)
@@ -298,6 +298,17 @@ class TestDataFiles(unittest.TestCase):
         self.assertTrue(events.is_any_time(ev))
         self.assertTrue(events.slot_text(ev).endswith("any time"))
         self.assertTrue(all(len(r) == 13 for r in seed.load_catalog()))  # includes running_this_term
+
+    def test_campus_places_and_directions(self):
+        p = campus.place_for("SRWC 203C")
+        self.assertEqual((p["building"], p["room"], p["off_campus"]), ("Student Recreation and Wellness Center", "203C", False))
+        self.assertIn("travelmode=walking", p["directions_url"])
+        self.assertEqual(campus.place_for("PH1 141")["building"], "Peterson Hall 1")   # PH1 wins over PH
+        self.assertTrue(campus.place_for("Bowlero Cerritos")["off_campus"])
+        unknown = campus.place_for("Some New Hall")
+        self.assertIn("California State University Long Beach", unknown["map_query"])
+        known = {c.strip() for c in (r[5] for r in seed.load_catalog())}
+        self.assertTrue(all(campus.place_for(l)["map_query"] for l in known))
 
     def test_eval_sets_sizes(self):
         import csv, json

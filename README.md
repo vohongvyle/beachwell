@@ -1,18 +1,19 @@
-### BeachWell
+# BeachWell
 
 **A weekly workload score for CSULB students.** BeachWell reads a student's Canvas deadlines and short daily check-ins, gives every week of the semester a Workload Score from 0 to 100 (Light, Moderate, Heavy or Overload), builds a study plan that spreads the work into lighter weeks, suggests small habits for heavy weeks, and recommends campus events that fit the student's free time. A Campus Stress Radar shows ASI, CAPS and instructors, anonymously, when whole groups of students are heading into an overload week.
 
 CECS 458/558 term project, Fall 2026. Team: Vo Hong Vy Le and Deborah Shaw.
 
-### What to do next (updated Oct 29, 2026)
+## What to do next (updated Oct 29, 2026)
 
-Phase 1 is done: the working prototype (all 7 parts), first evaluation results and the Phase 1 report. Since then (Oct 2026): Deborah's labels are in and the app learns from them, the event recommender and hour estimates improved, the safety rules were fixed after a fresh test exposed misses, the event catalog now holds 50 real campus programs (22 with confirmed times), and there are 36 tests. A short portfolio summary with screenshots is in `docs/reports/BeachWell_Portfolio_Summary.pdf`.
+Phase 1 is done: the working prototype (all 7 parts), first evaluation results and the Phase 1 report. Since then (Oct 2026): Deborah's labels are in and the app learns from them, the event recommender and hour estimates improved, the safety rules were fixed after a fresh test exposed misses, the event catalog holds real campus programs with confirmed times and walking directions, and there are 37 tests. A short portfolio summary with screenshots is in `docs/reports/BeachWell_Portfolio_Summary.pdf`.
 
 The list below is what is left, in order of due date. Owners are a proposal; change them as we agree.
 
 ### By Fri Oct 23: data
-- [x] **Real event dates** (Deborah, Oct 29–31): the tracker `docs/BeachWell_Event_Updates.xlsx` is filled in and imported. The catalog now has **50 programs; 22 have days and times confirmed on an official page**, and the app labels each pick "Checked" or "Not confirmed".
-- [ ] **Confirm the rest** (Deborah): fill in the short checklist `docs/BeachWell_Events_To_Check.xlsx` (22 real programs: Still running? Yes/No, the link you checked, and corrected days/time/weeks only if different). Then Vy runs `python scripts/apply_event_checks.py ../docs/BeachWell_Events_To_Check.xlsx` and `python scripts/seed.py --reset`; this updates the big tracker and the catalog. The 6 invented clubs need nothing.
+- [x] **Real event dates** (Deborah, Oct 29 – Nov 4): the tracker `docs/BeachWell_Event_Updates.xlsx` is filled in and imported. Of the 50 programs in the catalog, **30 run this term: all 24 real ones have days and times confirmed on an official page**, plus the 6 invented sample clubs. The other 20 are marked "Removed" / "Not running" and are no longer suggested.
+- [x] **Event locations and directions** (Nov 4): each suggested event shows its building and room, a walking-directions link and a small map (Google Maps, no API key). Building names live in `backend/data/campus_locations.csv`; add a row when a new building appears.
+- [ ] **Keep the event list current** (Deborah): when programs change, update the tracker, then run `python scripts/import_event_sheet.py ../docs/BeachWell_Event_Updates.xlsx` and `python scripts/seed.py --reset`. Optional: replace the 6 invented sample clubs with real clubs, or mark them "Removed".
 - [x] **Deborah's labels** (done Oct 27): `effort_labels_deborah.csv`, `persona_labels_deborah.csv`, and 30 safety messages in `safety_messages_team.csv`. They are already used: see "Learning from the team's labels" below.
 - [ ] **Vy's labels** (Vy): fill in `effort_labels_vy.csv` and `persona_labels_vy.csv` without looking at Deborah's (about 2 hours). Then we get agreement (Cohen's kappa) and averaged labels.
 - [ ] **Vy's unseen safety set** (Vy): 15 everyday-stress and 15 help-needed messages in `backend/labeling/safety_messages_unseen.csv`, written without looking at `agents/safety.py` or Deborah's set. Deborah's set was used to fix the rules, so this is now the honest test.
@@ -46,14 +47,14 @@ Both of us should be able to explain the whole system, since questions can go to
 
 ![Workload screen](docs/screenshots/2-workload.png)
 
-### What it does
+## What it does
 
 | Screen | What the student sees | AI behind it |
 | --- | --- | --- |
 | Workload | This week's score (0–100) and level, with reasons, plus a 7-week bar chart; the level always matches the whole number shown | Deadline Agent (effort estimates), Workload Agent (scoring) |
 | What-if slider | Start an assignment earlier, or "follow my plan," and watch the scores change; a dashed mark shows each week's score before the change | Workload Agent re-run with new inputs |
 | Plan | Study blocks of 90 minutes or less, with breaks; before/after workload levels; habit tips; .ics export | Planner Agent (scheduler + habits) |
-| Recharge | 2–3 de-stress events per heavy week that fit the student's free time and interests, varied across weeks, with a reason in the student's own words | Event Recommender (embeddings, learned event profiles, rules, Gemini re-ranking) |
+| Recharge | 2–3 de-stress events per heavy week that fit the student's free time and interests, varied across weeks, with a reason in the student's own words, the building and room, walking directions and a map | Event Recommender (embeddings, learned event profiles, rules, Gemini re-ranking) |
 | Check-in | Sleep and stress in 20 seconds; the note is safety-checked then discarded | Safety Agent |
 | My pace | "You take 30% longer than estimated on essays"; log hours, fix estimates | Personal pace model (learns from logged hours) |
 | Campus Radar | Heatmap by college and week, overload alerts, deadline collisions with a what-if | Radar Agent (anonymous aggregation, groups of 10+ only) |
@@ -94,11 +95,11 @@ In Canvas, open **Calendar**, then **Calendar Feed**, and copy the link. Paste i
 
 ```bash
 cd backend
-python -m unittest -v           # 36 tests, offline
+python -m unittest -v           # 37 tests, offline
 python eval/evaluate.py         # writes eval/results.md and eval/results.json
 ```
 
-### Evaluation (offline mode, from `backend/eval/results.md`)
+## Evaluation (offline mode, from `backend/eval/results.md`)
 
 | Component | Baseline | BeachWell |
 | --- | --- | --- |
@@ -121,14 +122,14 @@ Three of the six tests use synthetic data, and the labels so far come from one p
 
 Every number above that uses something learned is leave-one-out: a sample student or assignment is never scored with what was learned from it.
 
-### Screenshots
+## Screenshots
 
 | | |
 | --- | --- |
 | ![What-if slider](docs/screenshots/3-what-if.png) | ![Study plan](docs/screenshots/4-plan.png) |
 | ![Recharge picks](docs/screenshots/5-recharge.png) | ![Campus Radar](docs/screenshots/7-radar.png) |
 
-### Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -147,6 +148,81 @@ flowchart LR
 * **AI:** Google Gemini over its REST API (`beachwell/llm.py`), with deterministic offline fallbacks. How each prompt is used, and what the team built beyond the API, is documented in [docs/AI_WORKFLOW.md](docs/AI_WORKFLOW.md).
 * **Frontend:** one static page in `frontend/` (HTML, CSS and JavaScript modules, no build step), served by the backend.
 
+## Project layout
+
+```
+backend/
+  beachwell/
+    app.py            HTTP API and static file serving
+    service.py        glue between storage and agents
+    config.py         settings from environment variables / .env
+    db.py             SQLite schema (feed links never stored; check-in notes discarded)
+    ical.py           read Canvas .ics feeds, write .ics study plans
+    llm.py            Gemini REST client, call log, offline fallbacks
+    semester.py       week-of-term helpers
+    seed.py           loads the event catalog; builds the synthetic cohort and demo student
+    agents/
+      deadline.py     Deadline Agent: type and hour estimates
+      pace.py         personal pace model (empirical Bayes)
+      forecast.py     Workload Agent: weekly load index and reasons
+      planner.py      Planner Agent: scheduler, rule checker, habits
+      events.py       Event Recommender: retrieval, time fit, re-ranking
+      safety.py       Safety Agent: rules + Gemini, fixed crisis response
+      radar.py        Campus Radar: anonymous heatmap, alerts, collisions
+  data/               events_catalog.csv (editable), sample Canvas feeds (.ics),
+                      event_profiles.json and effort_calibration.json (learned from labels)
+  scripts/
+    seed.py                     create the database
+    make_practice_semesters.py  regenerate the 40 practice semesters
+    merge_labels.py             combine Vy's and Deborah's labels, measure agreement
+    learn_from_labels.py        learn event profiles and effort calibration from the labels
+    import_event_sheet.py       turn the team's event spreadsheet into data/events_catalog.csv
+    apply_event_checks.py       (optional) apply a short "To check" sheet to the tracker, then rebuild the catalog
+    score_sus.py                score the classmate survey
+  labeling/           blank labeling sheets for each team member, plus a how-to
+  tests/              unit and integration tests (python -m unittest)
+  eval/               evaluation data, script and results
+usability/            classmate test script, survey questions, response sheet
+frontend/             index.html, styles.css, app.js
+docs/AI_WORKFLOW.md   prompts, inputs/outputs, limitations, team contribution
+```
+
+## Main API endpoints
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| POST | `/api/users` | Create a student |
+| POST | `/api/users/{id}/calendar` | Import a Canvas feed (`{url}` or `{ics}`) |
+| PUT | `/api/users/{id}/classes` | Set weekly class times |
+| GET, POST | `/api/users/{id}/forecast` | Workload scores; POST for what-if (`extra_lead`, `use_plan`) |
+| GET | `/api/users/{id}/plan`, `/plan.ics` | Study plan, and as a calendar file |
+| GET | `/api/users/{id}/events` | De-stress picks for heavy weeks |
+| POST | `/api/users/{id}/checkins` | Check-in with safety screening |
+| GET | `/api/users/{id}/pace` | Personal pace model |
+| PATCH | `/api/users/{id}/tasks/{task_id}` | Log actual hours, fix an estimate, mark done |
+| GET | `/api/radar` | Campus Stress Radar |
+| GET | `/api/llm-log` | Recent Gemini calls (name, latency, success) |
+
+## Data
+
+The project needs no real student data. Every file below is either generated by our code, copied from public CSULB pages, or written by the team.
+
+| File | What it is | Where it comes from |
+| --- | --- | --- |
+| `backend/data/events_catalog.csv` | 50 campus programs (title, place, days, times, tags, source link, date confirmed, running this term) | Imported from `docs/BeachWell_Event_Updates.xlsx` with `python scripts/import_event_sheet.py`. 30 run this term: 24 real programs confirmed on official ASI, Recreation, CSULB and Carpenter Center pages, and 6 invented sample clubs. Then run `python scripts/seed.py --reset` |
+| `backend/data/campus_locations.csv` | Building codes as the team writes them (SRWC, PH1, LIB, …) mapped to names and map search text | Team; used for directions and maps |
+| `backend/data/sample_canvas_feed.ics` | A Canvas-style calendar feed for 5 courses (89 deadlines) | Generated; upload it on the welcome screen to test the import |
+| `backend/data/sample_canvas_feed_business.ics` | A second feed with 4 business and GE courses | Generated |
+| `backend/eval/data/practice_semesters.json` (+ `_deadlines.csv`) | 40 practice semesters, each with one known crunch week and one decoy week | Generated by `scripts/make_practice_semesters.py` |
+| `backend/eval/data/effort_labels.csv` | 60 assignment titles with type and hours | Written by `merge_labels.py` from the team's sheets (Deborah's only, until Vy's are done); the prototype's draft labels are kept in `eval/data/draft/` |
+| `backend/eval/data/event_personas.json` | 24 sample students and their best-fitting events | Same as above |
+| `backend/data/event_profiles.json`, `backend/data/effort_calibration.json` | What the app learned from the labels | `scripts/learn_from_labels.py` |
+| `backend/labeling/safety_messages_team.csv` | Deborah's 15 everyday-stress and 15 help-needed messages | Team; used to improve the safety rules (development set) |
+| `backend/labeling/safety_messages_unseen.csv` | Vy's 30 messages, the honest safety test | Team; to be written without looking at the rules |
+| `backend/eval/data/safety_messages.csv` | 30 everyday-stress and 30 help-needed messages | Written for the prototype |
+| `backend/labeling/` | Blank sheets for Vy and Deborah, the event list, and a fresh safety set to write | Team (see `labeling/README.md`, about 2 hours each) |
+| `usability/` | Test script, SUS survey and response sheet for 8–10 classmates | Team (see `usability/test_script.md`) |
+
 ### Team workflow for the data (in order)
 
 1. Each person fills in their own sheets in `backend/labeling/` without looking at the other's.
@@ -157,7 +233,7 @@ flowchart LR
 
 ## Data, privacy and responsible AI
 
-* Student data in this prototype is **sample or synthetic**. Campus programs are real except the clubs marked "sample"; 22 of 50 have days and times confirmed on an official page (shown as "Checked" with the date), the rest are shown as "Not confirmed". Semesters before Fall 2026 are simulated, to show recurring events as "expected".
+* Student data in this prototype is **sample or synthetic**. All 24 real campus programs suggested this term have days and times confirmed on an official page (shown as "Checked" with the date); the 6 invented clubs are shown as "Not confirmed". Semesters before Fall 2026 are simulated, to show recurring events as "expected". Directions and maps open Google Maps; no location data about students is used.
 * Canvas feed links are used once and never stored. Check-in notes are screened for safety and then discarded; only the two numbers are kept.
 * Students can delete everything with one request (`DELETE /api/users/{id}`).
 * The Campus Radar counts only students who opted in and never shows a group smaller than 10.

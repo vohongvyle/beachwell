@@ -81,16 +81,16 @@
     "pool": 20,
     "methods": {
       "Random order (baseline, average of 200 shuffles)": {
-        "precision_at_3": 0.119,
-        "found_at_3": 0.148,
+        "precision_at_3": 0.118,
+        "found_at_3": 0.147,
         "hit_at_1": 0.116,
-        "mrr": 0.299
+        "mrr": 0.298
       },
       "Most frequent programs (popularity baseline)": {
         "precision_at_3": 0.111,
         "found_at_3": 0.132,
         "hit_at_1": 0.042,
-        "mrr": 0.253
+        "mrr": 0.251
       },
       "Keyword overlap (baseline)": {
         "precision_at_3": 0.375,

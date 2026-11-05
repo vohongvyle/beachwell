@@ -26,7 +26,7 @@ import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from .. import llm, semester
+from .. import campus, llm, semester
 from ..ical import LOCAL_TZ
 
 # Approximate start dates of past terms, used only to project recurring events into
@@ -285,6 +285,7 @@ def _public(ev: dict) -> dict:
     return {k: ev[k] for k in ("id", "title", "organizer", "description", "location", "start", "end", "source_url")} | {
         "tags": ev["tags"].split(","), "expected": bool(ev.get("expected")), "is_sample": bool(ev.get("is_sample", 1)),
         "checked_on": ev.get("checked_on", "") or "",
+        "place": campus.place_for(ev.get("location", "")),
         "when": slot_text(ev)}
 
 

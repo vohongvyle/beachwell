@@ -47,8 +47,8 @@ Found@3 = good picks in the top 3 out of the most that were possible (a student 
 
 | Method | Precision@3 | Found@3 | Hit@1 | MRR |
 | --- | --- | --- | --- | --- |
-| Random order (baseline, average of 200 shuffles) | 0.119 | 0.148 | 0.116 | 0.299 |
-| Most frequent programs (popularity baseline) | 0.111 | 0.132 | 0.042 | 0.253 |
+| Random order (baseline, average of 200 shuffles) | 0.118 | 0.147 | 0.116 | 0.298 |
+| Most frequent programs (popularity baseline) | 0.111 | 0.132 | 0.042 | 0.251 |
 | Keyword overlap (baseline) | 0.375 | 0.493 | 0.625 | 0.738 |
 | BeachWell v1 (Phase 1 scoring) | 0.444 | 0.611 | 0.708 | 0.824 |
 | BeachWell v2 without learned profiles | 0.5 | 0.681 | 0.875 | 0.927 |

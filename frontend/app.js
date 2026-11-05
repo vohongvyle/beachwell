@@ -366,12 +366,30 @@ async function renderRecharge() {
         <article class="pick" style="border-left-color:${LEVEL_COLOR[w.level]}">
           <h3>${esc(p.title)}</h3>
           <p class="when" style="margin:0">${esc(p.when)}</p>
-          <p class="where" style="margin:0 0 6px">${esc(p.location)}, ${esc(p.organizer)}</p>
+          <p class="where" style="margin:0 0 6px">${p.place ? `${p.place.room ? `Room ${esc(p.place.room)}, ` : ""}${esc(p.place.building)}${p.place.off_campus ? " (off campus)" : ""}` : esc(p.location)}<br>${esc(p.organizer)}</p>
           ${p.expected ? `<span class="tag warn">Expected, not posted yet</span>` : ""}
           ${p.checked_on && !p.expected ? `<span class="tag ok">Checked ${new Date(p.checked_on + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>` : !p.expected ? `<span class="tag sample">Not confirmed</span>` : ""}
           <p class="why">${esc(p.reason)}</p>
-          ${p.source_url ? `<a class="small" href="${esc(p.source_url)}" target="_blank" rel="noopener">About this program</a>` : ""}
+          <div class="placelinks small">
+            ${p.place ? `<a href="${esc(p.place.directions_url)}" target="_blank" rel="noopener">${p.place.off_campus ? "Directions" : "Walking directions"}</a>
+            <button type="button" class="linkbtn" data-embed="${esc(p.place.embed_url)}" aria-expanded="false">Show map</button>` : ""}
+            ${p.source_url ? `<a href="${esc(p.source_url)}" target="_blank" rel="noopener">About this program</a>` : ""}
+          </div>
+          <div class="mapbox" hidden></div>
         </article>`).join("")}</div>` : `<p>No events fit your free time this week. A 15-minute walk counts too.</p>`}`).join("")}`;
+  // Show a small map inside the card only when asked, so the page stays light.
+  view.querySelectorAll("button[data-embed]").forEach((b) => {
+    b.onclick = () => {
+      const box = b.closest(".pick").querySelector(".mapbox");
+      const open = box.hidden;
+      if (open && !box.firstChild) {
+        box.innerHTML = `<iframe title="Map" src="${b.dataset.embed}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+      }
+      box.hidden = !open;
+      b.textContent = open ? "Hide map" : "Show map";
+      b.setAttribute("aria-expanded", String(open));
+    };
+  });
 }
 
 // ------------------------------------------------------------------ check-in
