@@ -1,16 +1,18 @@
 # BeachWell
 
-**A smarter way for CSULB students to plan busy weeks.**
+**A workload planner for CSULB students.**
 
 *CECS 458/558 · Fall 2026 · Team project by Vo Hong Vy Le and Deborah Shaw*
 
-We built BeachWell because college deadlines tend to pile up all at once. A calendar tells us *when* assignments are due, but not how stressful a week might be or how to spread the work out. BeachWell takes Canvas deadlines and quick daily check-ins, estimates a weekly workload score, and helps students make a more manageable plan. It also suggests campus activities that fit their schedules.
+For our CECS 458/558 project, we wanted to work on something we could actually see students using. We've both had weeks when several assignments were due around the same time, and just seeing everything on a calendar didn't really help us figure out where to start.
 
-Our goal isn't to tell students how they feel. It's to give them a clearer picture of what's coming up and a few practical ways to prepare.
+That's why we made BeachWell. Students can bring in their Canvas deadlines, see which weeks might get busy, and get a study plan that spreads the work out. We also added short daily check-ins and campus event suggestions, because managing a busy semester isn't only about finishing assignments.
+
+It's still a class project, so we're testing what works and what needs improvement.
 
 ![BeachWell workload dashboard](docs/screenshots/2-workload.png)
 
-## What we built
+## What you can do with BeachWell
 
 | Feature | What it does |
 | --- | --- |
@@ -54,7 +56,7 @@ In Canvas, go to **Calendar → Calendar Feed**. You can paste the feed URL on B
 
 ### Optional: use Gemini
 
-We designed the prototype to work **without an API key** using rules and offline text matching. If you want to try the Gemini-powered features, get a key from [Google AI Studio](https://aistudio.google.com) and add these values to `backend/.env`:
+The app also works **without an API key** using rules and offline text matching. If you want to try the Gemini-powered features, get a key from [Google AI Studio](https://aistudio.google.com) and add these values to `backend/.env`:
 
 ```dotenv
 GEMINI_API_KEY=your-key
@@ -62,11 +64,11 @@ LLM_MODEL=gemini-2.5-flash
 EMBEDDING_MODEL=gemini-embedding-001
 ```
 
-Restart the server. To rebuild the demo deadlines using Gemini estimates, run `python scripts/seed.py --reset --llm` from `backend/`. Model availability may change; see [Google's model documentation](https://ai.google.dev/gemini-api/docs/models). **Never commit `.env` or an API key.**
+Restart the server. To rebuild the demo deadlines using Gemini estimates, run `python scripts/seed.py --reset --llm` from `backend/`. Model availability may change; see [Google's model documentation](https://ai.google.dev/gemini-api/docs/models). Keep `.env` and API keys out of GitHub.
 
 ## How it works
 
-We split the logic into smaller agents so we could test and improve each part separately.
+We used separate modules for the different parts of the app. This made it easier for us to test one feature at a time instead of trying to debug everything together.
 
 ```mermaid
 flowchart LR
@@ -84,16 +86,16 @@ flowchart LR
 
 The **backend** uses Python, Starlette, Uvicorn, and SQLite. The **frontend** is plain HTML, CSS, and JavaScript. We integrated Gemini through a REST client, but kept deterministic offline fallbacks so the project can still be run and evaluated without paid services. More details about the prompts and agent boundaries are in [`docs/AI_WORKFLOW.md`](docs/AI_WORKFLOW.md).
 
-Two parts improved after we reviewed our early results:
+A couple of things changed quite a bit once we started looking at the test results:
 
-- **Effort estimates:** We used labeled assignments to calibrate the hours predicted by our original rules. The calibration adjusts estimates by assignment type and avoids overreacting when we have only a few examples.
-- **Event recommendations:** We learned event profiles from sample students' ranked choices. We also fixed overly generic search terms and word matching that had caused repetitive or irrelevant recommendations.
+- **Assignment time estimates:** Our first version relied on rules, but the predicted hours were often off. We used labeled assignments to adjust those estimates by assignment type, while being careful with categories that had only a few examples.
+- **Event suggestions:** At first, the app kept recommending some of the same activities. We used sample students' ranked choices to improve the matches, then fixed some search terms and word matching that were causing repetitive suggestions.
 
-For the learned components, our reported evaluation uses leave-one-out testing so an example isn't evaluated using a profile learned from itself.
+For these learned parts, we used leave-one-out evaluation so we weren't testing an example against information learned from that same example.
 
 ## What we tested
 
-We compared BeachWell against simpler baselines in offline mode. These are **prototype results**, not results from a campus deployment.
+We ran the offline version against a few simpler approaches to see whether our changes actually helped. These results are from our prototype tests, not from real campus use.
 
 | Test | Baseline | BeachWell |
 | --- | --- | --- |
@@ -105,7 +107,7 @@ We compared BeachWell against simpler baselines in offline mode. These are **pro
 | Event recommendations, Precision@3 (24 sample students) | 0.38 keyword baseline | **0.54** with learned profiles; Hit@1 **0.88**, MRR **0.93** |
 | Safety screening, 15 help-needed examples | Earlier rules caught 6/15 | Revised rules caught 15/15 on the same set, which is now development data |
 
-Some tests use synthetic data, and the labeled evaluation currently reflects one team member's labels. We still need a second independent labeling set, a truly unseen safety test, and results from running Gemini rather than mocked responses. See [`backend/eval/results.md`](backend/eval/results.md) for the evaluation details.
+There are limits to these numbers. Several tests use simulated students or semesters, and so far the labeling results come from Deborah's set. We still need Vy's independent labels, a new safety test set, and evaluation runs with Gemini enabled. The full results are in [`backend/eval/results.md`](backend/eval/results.md).
 
 To run the tests and regenerate results:
 
@@ -117,7 +119,9 @@ python eval/evaluate.py     # writes eval/results.md and eval/results.json
 
 ## Campus events and maps
 
-We started with a catalog of **50 programs**. After checking official campus sources, **24 real programs** were confirmed to run this term, along with **6 clearly labeled sample clubs**. The other 20 programs were marked not running and are excluded from suggestions. Real recommended programs have confirmed days and times, and the app shows building information, a map, and walking directions through Google Maps without requiring a Maps API key.
+We originally collected **50 campus programs**, but not all of them were actually running this semester. After checking the official pages, we kept **24 confirmed real programs** and **6 sample clubs** for the demo. The other 20 are marked as not running, so the app doesn't recommend them.
+
+We also added the building and room information, a map, and walking directions. That way, a recommendation is more useful than just the name of an event. The directions open in Google Maps, without needing a Maps API key.
 
 The event data comes from `docs/BeachWell_Event_Updates.xlsx` and is imported into `backend/data/events_catalog.csv`. Building names and map search text are kept in `backend/data/campus_locations.csv`.
 
@@ -131,19 +135,19 @@ python scripts/seed.py --reset
 
 ## Privacy and responsible AI
 
-We built the demo around **sample and synthetic student data**, rather than collecting real student records for our tests. Canvas feed links are not saved, and free-text check-in notes are screened and then discarded. Students can request deletion of their stored data.
+For testing, we used **sample and synthetic student data** instead of collecting actual student records. The app doesn't save Canvas feed links, and it discards written check-in notes after the safety check. Students can also delete their stored data.
 
 The Campus Radar only uses opt-in data and suppresses groups smaller than **10**. For check-ins that may indicate a crisis, BeachWell displays fixed human-written information about **988** and **CSULB CAPS**; Gemini does not generate the crisis response. The app provides planning support, **not a diagnosis or medical advice**. Students can correct the workload estimates.
 
 ## What we're still working on
 
-This is a course prototype, and there are a few important things we haven't finished:
+We're still working on a few things before the final course submission:
 
-- Collect event labels, measure agreement, and rerun evaluation.
+- Collect Vy's independent effort and event labels, measure agreement, and rerun evaluation.
 - Test safety screening on a new unseen set instead of the examples used to improve the rules.
 - Run and review real Gemini evaluations, including latency and estimation mistakes.
 - Check the Canvas import with a real feed locally and polish the mobile interface.
-- Run a usability study with classmates and review the cases where the app performs poorly.
+- Run a usability study with 8–10 classmates and review the cases where the app performs poorly.
 
 The semester dates still need to be configured for a real term. SQLite is appropriate for our prototype; a production campus system would need stronger deployment infrastructure and CSULB sign-in. Recurring-event projections are also estimates, not confirmed future schedules.
 
@@ -152,7 +156,9 @@ The semester dates still need to be configured for a real term. SQLite is approp
 | Team member | Main contributions |
 | --- | --- |
 | **Vo Hong Vy Le** | Backend development, AI agents, and evaluation |
-| **Deborah Shaw** | Frontend development, market data research, campus event catalog, and reports |
+| **Deborah Shaw** | Frontend development, market research, campus event catalog, and reports |
 | **Both** | Independent labeling and project testing |
+
+We divided up the main development work, then brought everything together into the same app.
 
 **License:** MIT
