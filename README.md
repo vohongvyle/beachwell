@@ -142,9 +142,9 @@ The Campus Radar only uses opt-in data and suppresses groups smaller than **10**
 
 ## What we're still working on
 
-We're still working on a few things before the final course submission:
+We're also still working on a few things before the final course submission:
 
-- Collect Vy's independent effort and event labels, measure agreement, and rerun evaluation.
+- Collect event labels, measure agreement, and rerun evaluation.
 - Test safety screening on a new unseen set instead of the examples used to improve the rules.
 - Run and review real Gemini evaluations, including latency and estimation mistakes.
 - Check the Canvas import with a real feed locally and polish the mobile interface.
@@ -156,10 +156,8 @@ The semester dates still need to be configured for a real term. SQLite is approp
 
 | Team member | Main contributions |
 | --- | --- |
-| **Vo Hong Vy Le** | Backend development, AI agents, and evaluation |
-| **Deborah Shaw** | Frontend development, market data research, campus event catalog |
+| **Vo Hong Vy Le** | Backend development, AI agents, and evaluation report |
+| **Deborah Shaw** | Frontend development, on campus data research, campus event catalog |
 | **Both** | Independent labeling and project testing |
-
-We divided up the main development work, then brought everything together into the same app.
 
 **License:** MIT
