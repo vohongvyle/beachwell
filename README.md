@@ -1,259 +1,167 @@
 # BeachWell
 
-**A weekly workload score for CSULB students.** BeachWell reads a student's Canvas deadlines and short daily check-ins, gives every week of the semester a Workload Score from 0 to 100 (Light, Moderate, Heavy or Overload), builds a study plan that spreads the work into lighter weeks, suggests small habits for heavy weeks, and recommends campus events that fit the student's free time. A Campus Stress Radar shows ASI, CAPS and instructors, anonymously, when whole groups of students are heading into an overload week.
+**Helping CSULB students plan around busy weeks, not just react to them.**
 
-CECS 458/558 term project, Fall 2026. Team: Vo Hong Vy Le and Deborah Shaw.
+BeachWell is our Fall 2026 CECS 458/558 team project. We wanted to build something that could look at a student's upcoming Canvas deadlines, estimate how demanding each week might be, and help them make a more manageable plan. Instead of only showing a calendar, BeachWell gives a weekly workload score, suggests when to start assignments, and recommends campus activities that fit around classes and studying.
 
-## What to do next (updated Oct 29, 2026)
+We also built a **Campus Stress Radar** to explore how aggregated, anonymous workload trends might help campus staff spot especially busy weeks. BeachWell is a planning prototype, not a medical or mental-health diagnostic tool.
 
-Phase 1 is done: the working prototype (all 7 parts), first evaluation results and the Phase 1 report. Since then (Oct 2026): Deborah's labels are in and the app learns from them, the event recommender and hour estimates improved, the safety rules were fixed after a fresh test exposed misses, the event catalog holds real campus programs with confirmed times and walking directions, and there are 37 tests. A short portfolio summary with screenshots is in `docs/reports/BeachWell_Portfolio_Summary.pdf`.
+**Team:** Vo Hong Vy Le and Deborah Shaw  
+**Course:** CECS 458/558 · Fall 2026
 
-The list below is what is left, in order of due date. Owners are a proposal; change them as we agree.
+![BeachWell workload dashboard](docs/screenshots/2-workload.png)
 
-### By Fri Oct 23: data
-- [x] **Real event dates** (Deborah, Oct 29 – Nov 4): the tracker `docs/BeachWell_Event_Updates.xlsx` is filled in and imported. Of the 50 programs in the catalog, **30 run this term: all 24 real ones have days and times confirmed on an official page**, plus the 6 invented sample clubs. The other 20 are marked "Removed" / "Not running" and are no longer suggested.
-- [x] **Event locations and directions** (Nov 4): each suggested event shows its building and room, a walking-directions link and a small map (Google Maps, no API key). Building names live in `backend/data/campus_locations.csv`; add a row when a new building appears.
-- [ ] **Keep the event list current** (Deborah): when programs change, update the tracker, then run `python scripts/import_event_sheet.py ../docs/BeachWell_Event_Updates.xlsx` and `python scripts/seed.py --reset`. Optional: replace the 6 invented sample clubs with real clubs, or mark them "Removed".
-- [x] **Deborah's labels** (done Oct 27): `effort_labels_deborah.csv`, `persona_labels_deborah.csv`, and 30 safety messages in `safety_messages_team.csv`. They are already used: see "Learning from the team's labels" below.
-- [ ] **Vy's labels** (Vy): fill in `effort_labels_vy.csv` and `persona_labels_vy.csv` without looking at Deborah's (about 2 hours). Then we get agreement (Cohen's kappa) and averaged labels.
-- [ ] **Vy's unseen safety set** (Vy): 15 everyday-stress and 15 help-needed messages in `backend/labeling/safety_messages_unseen.csv`, written without looking at `agents/safety.py` or Deborah's set. Deborah's set was used to fix the rules, so this is now the honest test.
-- [ ] **Re-learn and re-test** (Vy): `python scripts/merge_labels.py`, then `python scripts/learn_from_labels.py`, then `python eval/evaluate.py`.
+## What we built
 
-### By Fri Oct 30: run with Gemini
-- [ ] **Get a Gemini API key** from Google AI Studio and put it in `backend/.env` only. Never commit it.
-- [ ] **Re-run the evaluation** (Vy): `python eval/evaluate.py`, so the Gemini rows sit next to the offline and baseline rows.
-- [ ] **Review Gemini's mistakes** (Vy): check `GET /api/llm-log` and note latency, failures, and the hour estimates it got most wrong.
+| Feature | What it does |
+| --- | --- |
+| **Weekly workload** | Scores each week from 0–100 and labels it Light, Moderate, Heavy, or Overload. The dashboard also explains what is driving the score. |
+| **What-if planning** | Lets students see how starting earlier or following a suggested plan could change future workload scores. |
+| **Study plan** | Breaks assignments into study sessions of up to 90 minutes, adds breaks and habit suggestions, and exports a calendar `.ics` file. |
+| **Recharge recommendations** | Suggests 2–3 campus events for heavier weeks based on interests and available time. |
+| **Daily check-in** | Collects a quick sleep and stress check-in. Notes are checked for safety and then discarded. |
+| **My pace** | Learns from the hours students log so future assignment estimates can better match their pace. |
+| **Campus Stress Radar** | Shows workload patterns by college and week using opted-in, aggregated groups of at least 10 students. |
 
-### By Fri Nov 13: finished app on GitHub
-- [ ] **GitHub repo** (both): each person commits their own part (Vy: backend, AI agents, evaluation; Deborah: web app, event list, docs). Check that no key or personal data is in the repo.
-- [ ] **Test with a real Canvas feed** (both): import your own `.ics` locally to make sure the reader works. Do not upload it anywhere.
-- [ ] **Web app polish** (Deborah): phone layout, wording on every screen, page background (light grey-blue `#F3F7F8` now, set in `frontend/styles.css`).
+### A few screenshots
 
-### By Fri Nov 20: Phase 2
-- [ ] **2-page progress report** (Deborah writes, Vy adds the numbers): what was built, evaluation with the team's labels and Gemini, and what changed since Phase 1.
-- [ ] **GitHub documentation**: this README, `docs/AI_WORKFLOW.md` (prompts, inputs and outputs, limits), and how to reproduce the results.
+| Planning ahead | Building a study plan |
+| --- | --- |
+| ![What-if workload slider](docs/screenshots/3-what-if.png) | ![Study plan](docs/screenshots/4-plan.png) |
+| **Finding time to recharge** | **Campus-wide workload trends** |
+| ![Campus event recommendations](docs/screenshots/5-recharge.png) | ![Campus Stress Radar](docs/screenshots/7-radar.png) |
 
-### By Fri Dec 4: classmate test and error review
-- [ ] **Usability test** (Deborah leads): 8–10 classmates, following `usability/test_script.md`. Enter answers in `usability/sus_responses.csv`, then run `python scripts/score_sus.py`.
-- [ ] **Error review** (Vy): look at the worst cases (wrong hour estimates, poor event picks) and write them up for the final report.
+## How it works
 
-### By Fri Dec 11: Phase 3
-- [ ] **10-minute pitch video** (both; each presents their own part). Best demo moment: drag the what-if slider and watch an overload week's score drop. No keys or real student data on screen.
-- [ ] **Final report** (both).
+We divided the app into smaller components so we could test the workload estimates, planning, event recommendations, and safety checks separately.
 
-Both of us should be able to explain the whole system, since questions can go to either person.
+```mermaid
+flowchart LR
+    A[Canvas deadlines] --> B[Deadline estimates]
+    B --> C[Personal pace model]
+    C --> D[Weekly workload score]
+    E[Daily check-in] --> F{Safety check}
+    F -->|Needs support| G[988 and CSULB CAPS]
+    F -->|No flag| D
+    D --> H[Study planner]
+    D --> I[Campus event recommender]
+    H --> I
+    D --> J[Anonymous Campus Radar]
+```
 
-> BeachWell plans and recommends. It never diagnoses or gives medical advice, and any sign of crisis sends the student straight to the 988 Lifeline and CSULB CAPS.
+**Tech stack:** Python, Starlette, Uvicorn, SQLite, HTML, CSS, and JavaScript. We use Google Gemini through its REST API when configured, but we also built an offline mode using rules and hashed embeddings. The frontend is a static web app served by the Python backend, so there is no Node.js build step.
 
-![Workload screen](docs/screenshots/2-workload.png)
+The agent modules are in `backend/beachwell/agents/`. We documented the AI prompts, inputs, outputs, and limitations in [docs/AI_WORKFLOW.md](docs/AI_WORKFLOW.md).
 
-## What it does
+## Run it locally
 
-| Screen | What the student sees | AI behind it |
-| --- | --- | --- |
-| Workload | This week's score (0–100) and level, with reasons, plus a 7-week bar chart; the level always matches the whole number shown | Deadline Agent (effort estimates), Workload Agent (scoring) |
-| What-if slider | Start an assignment earlier, or "follow my plan," and watch the scores change; a dashed mark shows each week's score before the change | Workload Agent re-run with new inputs |
-| Plan | Study blocks of 90 minutes or less, with breaks; before/after workload levels; habit tips; .ics export | Planner Agent (scheduler + habits) |
-| Recharge | 2–3 de-stress events per heavy week that fit the student's free time and interests, varied across weeks, with a reason in the student's own words, the building and room, walking directions and a map | Event Recommender (embeddings, learned event profiles, rules, Gemini re-ranking) |
-| Check-in | Sleep and stress in 20 seconds; the note is safety-checked then discarded | Safety Agent |
-| My pace | "You take 30% longer than estimated on essays"; log hours, fix estimates | Personal pace model (learns from logged hours) |
-| Campus Radar | Heatmap by college and week, overload alerts, deadline collisions with a what-if | Radar Agent (anonymous aggregation, groups of 10+ only) |
+You'll need **Python 3.10+**. No separate database server or Node.js installation is required.
 
-## Quick start (about 5 minutes)
-
-Requirements: Python 3.10 or newer. No database server and no Node.js are needed.
+From the project root:
 
 ```bash
 cd backend
 python -m venv .venv
-# Windows: .venv\Scripts\activate      macOS/Linux: source .venv/bin/activate
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env              # Windows: copy .env.example .env
-python scripts/seed.py --reset    # sample events, a synthetic cohort, and the demo student "Vy"
+cp .env.example .env        # Windows: copy .env.example .env
+python scripts/seed.py --reset
 uvicorn beachwell.app:app --reload --port 8000
 ```
 
-Open **http://localhost:8000** and click **Open the demo**. The API list is at http://localhost:8000/api.
+Open **http://localhost:8000** and select **Open the demo**. The seed command loads sample campus events, a synthetic student cohort, and our demo student. API endpoints are listed at **http://localhost:8000/api**.
 
-### Turn on Gemini
+### Optional: use Gemini
 
-The app runs without an API key ("offline mode": rules and hashed embeddings), so anyone can reproduce the results. To use Gemini, put a key from [Google AI Studio](https://aistudio.google.com) in `backend/.env`:
+The app works without an API key. If you want to try the Gemini-supported features, get a key from [Google AI Studio](https://aistudio.google.com) and add these values to `backend/.env`:
 
-```
+```dotenv
 GEMINI_API_KEY=your-key
 LLM_MODEL=gemini-2.5-flash
 EMBEDDING_MODEL=gemini-embedding-001
 ```
 
-Restart the server. The footer of the app shows which mode is active. To estimate the demo student's deadlines with Gemini too, reseed with `python scripts/seed.py --reset --llm`. Check [Google's model list](https://ai.google.dev/gemini-api/docs/models) if a model name has been retired.
-
-### Use your own Canvas deadlines
-
-In Canvas, open **Calendar**, then **Calendar Feed**, and copy the link. Paste it on the BeachWell welcome screen, or download the `.ics` file and upload it. The link is used once to import deadlines and is never stored. Only `https://…instructure.com` links are accepted.
-
-### Reproduce a sample result
+Restart the server. To also generate the demo student's deadline estimates using Gemini, run this from `backend/`:
 
 ```bash
-cd backend
-python -m unittest -v           # 37 tests, offline
-python eval/evaluate.py         # writes eval/results.md and eval/results.json
+python scripts/seed.py --reset --llm
 ```
 
-## Evaluation (offline mode, from `backend/eval/results.md`)
+The app footer indicates which mode is active. Model availability can change; check [Google's model documentation](https://ai.google.dev/gemini-api/docs/models) if needed. **Never commit your `.env` file or API key.**
 
-| Component | Baseline | BeachWell |
+### Import Canvas deadlines
+
+In Canvas, go to **Calendar → Calendar Feed**. You can paste the feed link into BeachWell's welcome screen or download and upload the `.ics` file. The app uses the link for importing and does not save it; only HTTPS Canvas feed links under `instructure.com` are accepted.
+
+## Testing and results
+
+We started with a working Phase 1 prototype and then used our first labeling and evaluation results to improve the estimates and recommendations. The results below are from the **offline-mode evaluation** in `backend/eval/results.md`, not a live campus deployment.
+
+| What we measured | Earlier baseline | Current BeachWell result |
 | --- | --- | --- |
-| Effort estimates, mean abs. error (60 items labeled by Deborah) | 2.99 h (type keyword only); 2.63 h (Phase 1 rules) | **1.92 h** with calibration learned from labels (leave-one-out) |
-| Finding crunch weeks, F1 (40 synthetic semesters) | 0.67 (deadline count) | **1.00** |
-| Pace learning, error in weeks 9–17 (40 simulated students) | 1.28 h (no pace) | **0.68 h** |
-| Planner, average peak week (20 synthetic students) | 36.0 h | **27.4 h**, 0 rule violations |
-| Planner, overload weeks per student | 2.65 | **1.05** |
-| Event picks for 24 sample students (Deborah's picks), the 20 programs they chose from | Keyword overlap: Precision@3 0.38, Hit@1 0.63. Phase 1 BeachWell: 0.44, 0.71 | **0.54, Hit@1 0.88, MRR 0.93** with learned profiles (leave-one-out) |
-| Safety screen, Deborah's 15 help-needed messages (first, unseen run) | – | Phase 1 rules caught **6/15**; after adding general patterns, 15/15 (now a development set) |
+| Assignment effort error (60 labeled items) | 2.99 hours, keyword baseline; 2.63 hours, Phase 1 rules | **1.92 hours** mean absolute error after calibration |
+| Identifying crunch weeks (40 synthetic semesters) | 0.67 F1 | **1.00 F1** |
+| Personal pace error, weeks 9–17 (40 simulated students) | 1.28 hours | **0.68 hours** |
+| Average busiest week after planning (20 synthetic students) | 36.0 hours | **27.4 hours**, with no planner rule violations |
+| Average overload weeks per student | 2.65 | **1.05** |
+| Event recommendations (24 sample students) | 0.38 Precision@3 and 0.63 Hit@1, keyword baseline | **0.54 Precision@3**, **0.88 Hit@1**, **0.93 MRR** |
+| Safety screening (15 help-needed development messages) | 6/15 caught by the initial rules | **15/15** after revising the rules on this same set |
 
-Three of the six tests use synthetic data, and the labels so far come from one person (Deborah); see the notes in `eval/results.md`. The honest safety test is Vy's unseen set, still to be written. Run with a Gemini key to add the Gemini rows.
+These numbers need context: several evaluations use synthetic data, and the human labels used for the published results came from one teammate. For the learned effort and event models, we used leave-one-out evaluation so an item was not tested against a model trained on that same item. The improved safety result is **not** an independent validation, because we revised the rules after seeing the initial misses. A separate unseen safety test is still planned.
 
-### Learning from the team's labels (Oct 2026)
+To run the tests and evaluation from `backend/`:
 
-`scripts/learn_from_labels.py` turns the labeling sheets into two small learned files that the app uses:
+```bash
+python -m unittest -v
+python eval/evaluate.py
+```
 
-* **Event profiles** (`backend/data/event_profiles.json`). For each program, what the sample students who picked it wrote, weighted by pick order (relevance feedback, Rocchio-style). A new student's words are compared with these profiles as well as with the event text, so "I really need sleep" finds the Rest and Recharge Room. Two more fixes came from studying the misses: the generic "relax, stress relief" phrase is no longer added to every query (it pushed the same stress workshop into almost everyone's top 3), and the offline tokenizer now matches "painting", "stretching" and "hiking" with "paint", "stretch" and "hike".
-* **Effort calibration** (`backend/data/effort_calibration.json`). A per-type multiplier that moves the rule-based hours toward the labels, shrunk toward the overall ratio when a type has few examples.
+The evaluation writes `eval/results.md` and `eval/results.json`. The project had **36 offline tests** at the time of this README update.
 
-Every number above that uses something learned is leave-one-out: a sample student or assignment is never scored with what was learned from it.
+### What we changed after testing
 
-## Screenshots
+We used our labeled examples to improve two parts of the app:
 
-| | |
+- **Assignment time estimates:** `scripts/learn_from_labels.py` creates `data/effort_calibration.json`, which adjusts rule-based estimates by assignment type while limiting the effect of categories with very few examples.
+- **Event recommendations:** The same script creates `data/event_profiles.json` from sample students' ranked event choices. We compare a student's interests with both event descriptions and learned profiles. We also fixed some word matching and removed a generic stress-relief phrase that was making the same event appear too often.
+
+The campus event catalog currently includes **50 real programs**, with **22 schedules confirmed** against official pages. The app distinguishes checked schedules from those not yet confirmed. Sample clubs are marked separately.
+
+## Privacy and responsible use
+
+We built BeachWell as a student project, so we wanted the demo to be useful without pretending it was ready for real campus deployment.
+
+- The prototype uses sample or synthetic student records, not a real campus-wide student dataset.
+- Canvas feed links are used for import and are not stored.
+- Free-text check-in notes are screened and discarded; only the numeric check-in values are retained.
+- A student can request deletion of their data through `DELETE /api/users/{id}`.
+- Campus Radar uses only opted-in data and suppresses groups smaller than 10.
+- Safety responses directing students to **988** and **CSULB CAPS** use fixed, human-written text rather than model-generated advice.
+- Workload and time estimates are estimates, not diagnoses or guarantees. Students can correct estimated hours.
+
+## Limitations and next steps
+
+This is still a course prototype. Gemini integration has been implemented and tested with mocked responses, but the published evaluation above uses offline mode. We still need independent labels from both teammates, an unseen safety test, real-feed checks performed locally, and a usability study with classmates. The semester dates also need to be configured for the actual term.
+
+For a production version, we would need stronger deployment infrastructure, campus authentication, and further privacy and safety review. The current SQLite setup is intended for a prototype; PostgreSQL and CSULB SSO are possible future changes. Projected recurring events are estimates and may not happen on the same week each term.
+
+### Remaining course milestones
+
+- **November 13:** Finish GitHub setup, check the Canvas import locally, and polish the web app.
+- **November 20:** Submit the Phase 2 progress report and reproducibility documentation.
+- **December 4:** Run an 8–10 person classmate usability study and review difficult cases.
+- **December 11:** Submit the final report and 10-minute pitch video.
+
+The earlier internal checklist also includes verifying more event schedules, collecting Vy's independent labels and unseen safety messages, re-running evaluation, and checking Gemini's latency and mistakes. We keep the detailed workflow in our labeling sheets, scripts, and project documents rather than putting every internal task at the top of the README.
+
+## Our contributions
+
+| Team member | Main work |
 | --- | --- |
-| ![What-if slider](docs/screenshots/3-what-if.png) | ![Study plan](docs/screenshots/4-plan.png) |
-| ![Recharge picks](docs/screenshots/5-recharge.png) | ![Campus Radar](docs/screenshots/7-radar.png) |
+| **Vo Hong Vy Le** | Backend, AI agents, and evaluation |
+| **Deborah Shaw** | Frontend web app, market research, event catalog, and reports |
+| **Both** | Independent data labeling and overall project review |
 
-## Architecture
+This project was developed for **CECS 458/558, Fall 2026**.
 
-```mermaid
-flowchart LR
-  A[Canvas feed .ics] --> D[Deadline Agent<br/>type + hours]
-  C[Daily check-in] --> S{Safety Agent}
-  S -- needs help --> H[988 + CAPS<br/>fixed text]
-  S -- ok --> F
-  D --> P0[Pace model<br/>learns from logged hours] --> F[Workload Agent<br/>score 0 to 100]
-  F --> PL[Planner Agent<br/>blocks, breaks, habits]
-  F --> E[Event Recommender<br/>embeddings + Gemini]
-  PL --> E
-  F -. anonymous totals .-> R[Campus Radar<br/>groups of 10+]
-```
-
-* **Backend:** Python, [Starlette](https://www.starlette.io) (the framework FastAPI is built on) served by Uvicorn, SQLite from the standard library. Each agent is a plain module in `backend/beachwell/agents/` with its own tests.
-* **AI:** Google Gemini over its REST API (`beachwell/llm.py`), with deterministic offline fallbacks. How each prompt is used, and what the team built beyond the API, is documented in [docs/AI_WORKFLOW.md](docs/AI_WORKFLOW.md).
-* **Frontend:** one static page in `frontend/` (HTML, CSS and JavaScript modules, no build step), served by the backend.
-
-## Project layout
-
-```
-backend/
-  beachwell/
-    app.py            HTTP API and static file serving
-    service.py        glue between storage and agents
-    config.py         settings from environment variables / .env
-    db.py             SQLite schema (feed links never stored; check-in notes discarded)
-    ical.py           read Canvas .ics feeds, write .ics study plans
-    llm.py            Gemini REST client, call log, offline fallbacks
-    semester.py       week-of-term helpers
-    seed.py           loads the event catalog; builds the synthetic cohort and demo student
-    agents/
-      deadline.py     Deadline Agent: type and hour estimates
-      pace.py         personal pace model (empirical Bayes)
-      forecast.py     Workload Agent: weekly load index and reasons
-      planner.py      Planner Agent: scheduler, rule checker, habits
-      events.py       Event Recommender: retrieval, time fit, re-ranking
-      safety.py       Safety Agent: rules + Gemini, fixed crisis response
-      radar.py        Campus Radar: anonymous heatmap, alerts, collisions
-  data/               events_catalog.csv (editable), sample Canvas feeds (.ics),
-                      event_profiles.json and effort_calibration.json (learned from labels)
-  scripts/
-    seed.py                     create the database
-    make_practice_semesters.py  regenerate the 40 practice semesters
-    merge_labels.py             combine Vy's and Deborah's labels, measure agreement
-    learn_from_labels.py        learn event profiles and effort calibration from the labels
-    import_event_sheet.py       turn the team's event spreadsheet into data/events_catalog.csv
-    apply_event_checks.py       (optional) apply a short "To check" sheet to the tracker, then rebuild the catalog
-    score_sus.py                score the classmate survey
-  labeling/           blank labeling sheets for each team member, plus a how-to
-  tests/              unit and integration tests (python -m unittest)
-  eval/               evaluation data, script and results
-usability/            classmate test script, survey questions, response sheet
-frontend/             index.html, styles.css, app.js
-docs/AI_WORKFLOW.md   prompts, inputs/outputs, limitations, team contribution
-```
-
-## Main API endpoints
-
-| Method | Path | Purpose |
-| --- | --- | --- |
-| POST | `/api/users` | Create a student |
-| POST | `/api/users/{id}/calendar` | Import a Canvas feed (`{url}` or `{ics}`) |
-| PUT | `/api/users/{id}/classes` | Set weekly class times |
-| GET, POST | `/api/users/{id}/forecast` | Workload scores; POST for what-if (`extra_lead`, `use_plan`) |
-| GET | `/api/users/{id}/plan`, `/plan.ics` | Study plan, and as a calendar file |
-| GET | `/api/users/{id}/events` | De-stress picks for heavy weeks |
-| POST | `/api/users/{id}/checkins` | Check-in with safety screening |
-| GET | `/api/users/{id}/pace` | Personal pace model |
-| PATCH | `/api/users/{id}/tasks/{task_id}` | Log actual hours, fix an estimate, mark done |
-| GET | `/api/radar` | Campus Stress Radar |
-| GET | `/api/llm-log` | Recent Gemini calls (name, latency, success) |
-
-## Data
-
-The project needs no real student data. Every file below is either generated by our code, copied from public CSULB pages, or written by the team.
-
-| File | What it is | Where it comes from |
-| --- | --- | --- |
-| `backend/data/events_catalog.csv` | 50 campus programs (title, place, days, times, tags, source link, date confirmed, running this term) | Imported from `docs/BeachWell_Event_Updates.xlsx` with `python scripts/import_event_sheet.py`. 30 run this term: 24 real programs confirmed on official ASI, Recreation, CSULB and Carpenter Center pages, and 6 invented sample clubs. Then run `python scripts/seed.py --reset` |
-| `backend/data/campus_locations.csv` | Building codes as the team writes them (SRWC, PH1, LIB, …) mapped to names and map search text | Team; used for directions and maps |
-| `backend/data/sample_canvas_feed.ics` | A Canvas-style calendar feed for 5 courses (89 deadlines) | Generated; upload it on the welcome screen to test the import |
-| `backend/data/sample_canvas_feed_business.ics` | A second feed with 4 business and GE courses | Generated |
-| `backend/eval/data/practice_semesters.json` (+ `_deadlines.csv`) | 40 practice semesters, each with one known crunch week and one decoy week | Generated by `scripts/make_practice_semesters.py` |
-| `backend/eval/data/effort_labels.csv` | 60 assignment titles with type and hours | Written by `merge_labels.py` from the team's sheets (Deborah's only, until Vy's are done); the prototype's draft labels are kept in `eval/data/draft/` |
-| `backend/eval/data/event_personas.json` | 24 sample students and their best-fitting events | Same as above |
-| `backend/data/event_profiles.json`, `backend/data/effort_calibration.json` | What the app learned from the labels | `scripts/learn_from_labels.py` |
-| `backend/labeling/safety_messages_team.csv` | Deborah's 15 everyday-stress and 15 help-needed messages | Team; used to improve the safety rules (development set) |
-| `backend/labeling/safety_messages_unseen.csv` | Vy's 30 messages, the honest safety test | Team; to be written without looking at the rules |
-| `backend/eval/data/safety_messages.csv` | 30 everyday-stress and 30 help-needed messages | Written for the prototype |
-| `backend/labeling/` | Blank sheets for Vy and Deborah, the event list, and a fresh safety set to write | Team (see `labeling/README.md`, about 2 hours each) |
-| `usability/` | Test script, SUS survey and response sheet for 8–10 classmates | Team (see `usability/test_script.md`) |
-
-### Team workflow for the data (in order)
-
-1. Each person fills in their own sheets in `backend/labeling/` without looking at the other's.
-2. Write safety messages: Deborah's 30 are in `safety_messages_team.csv` (now a development set); Vy writes 30 more in `safety_messages_unseen.csv` without looking at the rules.
-3. Run `python scripts/merge_labels.py`, then `python scripts/learn_from_labels.py`, then `python eval/evaluate.py`.
-4. Run the classmate test, type answers into `usability/sus_responses.csv`, then run `python scripts/score_sus.py`.
-5. Quote `labeling/agreement_report.md`, `eval/results.md` and `usability/sus_results.md` in the reports.
-
-## Data, privacy and responsible AI
-
-* Student data in this prototype is **sample or synthetic**. All 24 real campus programs suggested this term have days and times confirmed on an official page (shown as "Checked" with the date); the 6 invented clubs are shown as "Not confirmed". Semesters before Fall 2026 are simulated, to show recurring events as "expected". Directions and maps open Google Maps; no location data about students is used.
-* Canvas feed links are used once and never stored. Check-in notes are screened for safety and then discarded; only the two numbers are kept.
-* Students can delete everything with one request (`DELETE /api/users/{id}`).
-* The Campus Radar counts only students who opted in and never shows a group smaller than 10.
-* The crisis response is fixed text written by people; the language model never writes it.
-* Workload scores are estimates and are labeled that way. Effort estimates can always be corrected by the student.
-
-## Known limitations
-
-* Gemini support is implemented and tested with mocked responses, but the published numbers are offline-mode results. Run `python eval/evaluate.py` with a key to measure the Gemini versions.
-* Evaluation labels come from one team member so far; a second set is needed to measure agreement.
-* The semester calendar (start date, Thanksgiving week) is a placeholder; set it in `.env`.
-* SQLite suits a prototype. A campus deployment would move to PostgreSQL and add sign-in with CSULB SSO.
-* The "expected events" projection assumes recurring programs keep the same week of term.
-
-## Team contributions
-
-| Member | Responsibility |
-| --- | --- |
-| Vo Hong Vy Le | Backend, AI agents and evaluation |
-| Deborah Shaw | Web app, market research, event catalog and reports |
-| Both | Independent labeling of the test data |
-
-License: MIT.
+**License:** MIT.
