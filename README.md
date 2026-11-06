@@ -51,7 +51,7 @@ uvicorn beachwell.app:app --reload --port 8000
 
 Visit **http://localhost:8000** and choose **Open the demo**. The seed script creates sample events, a synthetic group of students, and a demo student. API routes are listed at `http://localhost:8000/api`.
 
-### Try it with Canvas
+#### Try it with Canvas
 
 In Canvas, go to **Calendar → Calendar Feed**. You can paste the feed URL on BeachWell's welcome screen or download and upload the `.ics` file. The app uses the link to import deadlines without storing it. Only `https://…instructure.com` feed URLs are accepted.
 
