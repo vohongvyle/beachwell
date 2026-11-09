@@ -11,6 +11,7 @@ We also built a **Campus Stress Radar** to explore how aggregated, anonymous wor
 **Team:** Vo Hong Vy Le and Deborah Shaw  
 **Course:** CECS 458/558 · Fall 2026
 
+
 ![BeachWell workload dashboard](docs/screenshots/2-workload.png)
 
 ## What you can do with BeachWell
